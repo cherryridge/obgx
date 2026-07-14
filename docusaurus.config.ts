@@ -4,11 +4,13 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 const config :Config = {
     title: "OBGX Documentation",
-    tagline: "Open Block Game Extension Interface",
+    tagline: "Documentation for the Open Block Game Extension Interface.",
     favicon: "img/favicon.ico",
 
     future: {
-        v4: true
+        v4: {
+            fasterByDefault: false
+        }
     },
 
     url: "https://obgx.org",
@@ -45,75 +47,20 @@ const config :Config = {
     ]],
 
     themeConfig: {
-        image: 'img/docusaurus-social-card.jpg',
+        image: "img/docusaurus-social-card.jpg",
         colorMode: {
-            respectPrefersColorScheme: true,
+            defaultMode: "light",
+            disableSwitch: false
         },
-        navbar: {
-            title: 'My Site',
-            logo: {
-                alt: 'My Site Logo',
-                src: 'img/logo.svg',
-            },
-            items: [
-                {
-                    type: 'docSidebar',
-                    sidebarId: 'tutorialSidebar',
-                    position: 'left',
-                    label: 'Tutorial',
-                },
-                {to: '/blog', label: 'Blog', position: 'left'},
-                {
-                    href: 'https://github.com/facebook/docusaurus',
-                    label: 'GitHub',
-                    position: 'right',
-                },
-            ],
-        },
+        navbar: {},
         footer: {
-            style: 'dark',
-            links: [
-                {
-                    title: 'Docs',
-                    items: [
-                        {
-                            label: 'Tutorial',
-                            to: '/docs/intro',
-                        },
-                    ],
-                },
-                {
-                    title: 'Community',
-                    items: [
-                        {
-                            label: 'Stack Overflow',
-                            href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-                        },
-                        {
-                            label: 'Discord',
-                            href: 'https://discordapp.com/invite/docusaurus',
-                        },
-                        {
-                            label: 'X',
-                            href: 'https://x.com/docusaurus',
-                        },
-                    ],
-                },
-                {
-                    title: 'More',
-                    items: [
-                        {
-                            label: 'Blog',
-                            to: '/blog',
-                        },
-                        {
-                            label: 'GitHub',
-                            href: 'https://github.com/facebook/docusaurus',
-                        },
-                    ],
-                },
-            ],
-            copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+            style: "dark",
+            links: [],
+            copyright: `
+                <div style="padding-top:1rem">
+                    <div>Copyright © ${new Date().getFullYear()} CherryRidge.</div>
+                </div>
+            `,
         },
         prism: {
             theme: prismThemes.github,
