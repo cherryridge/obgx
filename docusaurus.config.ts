@@ -3,9 +3,9 @@ import type {Config} from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 
 const config :Config = {
-    title: "OBGX Documentation",
+    title: "OBGX Docs",
     tagline: "Documentation for the Open Block Game Extension Interface.",
-    favicon: "img/favicon.ico",
+    favicon: "img/logo.png",
 
     future: {
         v4: {
@@ -32,6 +32,8 @@ const config :Config = {
         }
     },
 
+    themes: ["@docusaurus/theme-mermaid"],
+
     presets: [[
         "classic", {
             docs: {
@@ -47,12 +49,75 @@ const config :Config = {
     ]],
 
     themeConfig: {
-        image: "img/docusaurus-social-card.jpg",
         colorMode: {
             defaultMode: "light",
             disableSwitch: false
         },
-        navbar: {},
+        navbar: {
+            logo: {
+                alt: "OBGX Logo",
+                src: "img/logo.png",
+                style: {
+                    WebkitUserDrag: "none"
+                }
+            },
+            items: [
+                {
+                    position: "left",
+                    label: "Overview",
+                    to: "overview"
+                },
+                {
+                    position: "left",
+                    label: "Data Model",
+                    to: "domain/data-model"
+                },
+                {
+                    position: "left",
+                    label: "Game Model",
+                    to: "domain/game-model"
+                },
+                {
+                    position: "left",
+                    label: "Presentation",
+                    to: "domain/presentation"
+                },
+                {
+                    position: "left",
+                    label: "Interaction",
+                    to: "domain/interaction"
+                },
+                {
+                    position: "left",
+                    label: "Host Services",
+                    to: "domain/host-services"
+                },
+                {
+                    position: "left",
+                    label: "Host Integration",
+                    to: "domain/host-integration"
+                },
+                {
+                    position: "left",
+                    label: "Diagnostics",
+                    to: "domain/diagnostics"
+                },
+                {
+                    type: "localeDropdown",
+                    position: "right",
+                    dropdownItemsAfter: [
+                        {
+                            type: "html",
+                            value: "<div style='margin:.4rem .2rem;border-top:solid 1px var(--ifm-toc-border-color)'/>"
+                        },
+                        {
+                            label: "Help Us Translate!",
+                            to: "contributing#translate"
+                        }
+                    ]
+                }
+            ]
+        },
         footer: {
             style: "dark",
             links: [],

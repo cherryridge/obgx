@@ -1,12 +1,6 @@
-/**
-* Any CSS included here will be global. The classic template
-* bundles Infima by default. Infima is a CSS framework designed to
-* work well for content-centric websites.
-*/
-
-/* You can override the default Infima variables here. */
-:root {
-    --ifm-color-primary: #2e8555;
+:root{
+    --ifm-blockquote-color: #6d6c6c;
+    --ifm-color-primary: #52bb84;
     --ifm-color-primary-dark: #29784c;
     --ifm-color-primary-darker: #277148;
     --ifm-color-primary-darkest: #205d3b;
@@ -17,9 +11,10 @@
     --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
-    --ifm-color-primary: #25c2a0;
+html[data-theme="dark"]{
+    --ifm-background-color: #1b1f1f;
+    --ifm-blockquote-color: #9f9f9f;
+    --ifm-color-primary: #35c9a9;
     --ifm-color-primary-dark: #21af90;
     --ifm-color-primary-darker: #1fa588;
     --ifm-color-primary-darkest: #1a8870;
@@ -27,4 +22,74 @@
     --ifm-color-primary-lighter: #32d8b4;
     --ifm-color-primary-lightest: #4fddbf;
     --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] :where(.button--secondary){
+    --ifm-button-background-color: #35b79b;
+    --ifm-button-border-color: #35b79b;
+}
+
+html[data-theme="dark"] :where(.button--secondary):not(.button--outline):hover{
+    --ifm-button-background-color: #43ceb0;
+    --ifm-button-border-color: #43ceb0;
+}
+
+html[data-theme="dark"] :where(.button--secondary):not(.button--outline):active{
+    --ifm-button-background-color: #2fc4a4;
+    --ifm-button-border-color: #2fc4a4;
+}
+
+.twemoji{
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin: 0 .05em 0 .1em;
+    vertical-align: -0.1em;
+}
+
+.main-wrapper{
+    min-height: 80dvh;
+}
+
+h2{
+    font-size: 2rem;
+}
+
+h3{
+    font-size: 1.6rem;
+}
+
+h4{
+    font-size: 1.35rem;
+    line-height: 1.35;
+}
+
+h5{
+    font-size: 1.1rem;
+}
+
+.cards--3 .col--6{
+    flex: 0 0 33.3333%;
+    max-width: 33.3333%;
+}
+
+@media (max-width: 996px) {
+    .cards--3 .col--6 {
+        flex-basis: 50%;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 576px) {
+    .cards--3 .col--6 {
+        flex-basis: 100%;
+        max-width: 100%;
+    }
+}
+
+.desc-lg .col--6 p{
+    white-space: normal;
+    overflow-wrap: normal;
+    font-size: .9rem;
+    line-height: 1.55;
 }

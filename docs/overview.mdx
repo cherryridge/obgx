@@ -1,0 +1,57 @@
+# Overview
+
+## About OBGX
+
+**O**pen **B**lock **G**ame E**x**tension Interface (**OBGX**) is an interface standard for building and extending block games from interoperable components, authored by different parties. It is designed to be a flexible and extensible framework that allows different developers to create and share game elements, resolve conflicts, and enable seamless integration of new features into existing games.
+
+## Characteristics
+
+- **Interoperability**: OBGX allows different game components developed by different and previously unknown developers to coexist and work together, with minimal friction and easy implementation for more complicated features, such as engine-level determinism.
+- **Platform Agnostic**: Although developed by CherryRidge and originates from the CherryGrove game framework, OBGX is designed to be platform agnostic, meaning it can be implemented in different existing or future block game engines, enabling content developers to target multiple games with a single implementation.
+- **Language Agnostic**: OBGX doesn't require developers to use a specific programming language to implement, or to use an existing interface. Even declarative languages such as JSON or YAML can be used to implement some of the simple modules.
+- **Extensibility**: OBGX does not limit implementers to a specific set or version of modules. Engine developers can implement their own vendored modules, and content developers can use it just like any other standard module.
+
+## Boundaries
+
+The following aspects of a block game engine's modding/datapack/content pack API are NOT in scope for OBGX:
+
+1. Pack-level identity. OBGX does not define how a content pack is identified, versioned or the dependency management.
+2. Pack-level interface interaction. OBGX does not specify how and when, one or many packs should interact with the interface. OBGX only defines the interface and the expected behavior of the engine, and the engine is free to decide how to manage the content packs' interaction.
+
+## Terminology
+
+### Standard
+
+Refers to the whole OBGX.
+
+### Edition
+
+Refers to the periodic aggregate release of the OBGX standard. The current edition scheme is `OBGX <yy>.<m>.`. For example: `OBGX 26.9` refers to the September 2026 release of the OBGX standard.
+
+### Domain
+
+Refers to a specific area of functionality within the OBGX standard, divided by manual semantic boundaries.
+
+Current domains include:
+
+1. **Data Model**: Defines the data structures and formats used for representing OBGX understandable data.
+2. **Game Model**: Defines the game content and mechanics that can be implemented using OBGX, including blocks, entities, etc.
+3. **Presentation**: Defines the presentation layer of the game, including texts, textures, sounds, etc.
+4. **Interaction**: Defines the interaction layer of the game, including user input, GUI, and other interaction mechanisms.
+5. **Host Services**: Defines the out-of-game capabilities that can be provided, such as networking, storage, multimedia, and other services that can be used by the content packs.
+6. **Host Integration**: Defines the lower level integration of the game engine with content packs, possibly including render pipelines, network packets, and other engine-level integration points.
+7. **Diagnostics**: Defines the diagnostic and debugging capabilities that can be provided by the game engine to content packs, including logging, error reporting, profiling, and other diagnostic tools.
+
+### Module
+
+Refers to an independent unit of functionality within a domain, which can probably be implemented as a unit.
+
+Module is the core concept of OBGX, so important that they have their identifiers, and is the unit of versioning and dependency management.
+
+The scheme for module identifiers is `[<vendor>/]<moduleName>@<version>`, in which `<vendor>` and `<moduleName>` matches `^[a-z](?:[a-z0-9-]*[a-z0-9])?$`, and `<version>` matches `^[1-9][0-9]*$`.
+
+For example, `block@1` and `cherrygrove/block-layers@200` are valid module identifiers.
+
+The vendor is optional. An unqualified module is a standard module specified by the OBGX standard. A vendor-qualified module and an unqualified module with the same module name are distinct modules. For example, `block@1` and `cherrygrove/block@1` do not identify the same module.
+
+A specific version of a module can have dependencies on other modules, with specific versions or version ranges.
