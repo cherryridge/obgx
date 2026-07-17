@@ -7,6 +7,7 @@
 # Generated files
 .docusaurus
 .cache-loader
+/i18n/*/docusaurus-plugin-content-docs-edition/current
 
 # Misc
 .DS_Store
@@ -21,4 +22,5 @@ yarn-error.log*
 
 .vscode
 .agents
+.codex
 .local

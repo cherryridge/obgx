@@ -1,19 +1,14 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
+general:
+  label: General
+  permalink: /general
+  description: General updates and news about OBGX.
 
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+release:
+  label: Release
+  permalink: /release
+  description: Announcements and updates about new edition releases and revisions in OBGX.
 
-docusaurus:
-  label: Docusaurus
-  permalink: /docusaurus
-  description: Docusaurus tag description
-
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+feature:
+  label: Feature
+  permalink: /feature
+  description: Updates about upcoming features in OBGX.
