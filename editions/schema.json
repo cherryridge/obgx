@@ -1,0 +1,41 @@
+{
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string",
+            "description": "The unique identifier of the edition."
+        },
+        "status": {
+            "type": "string",
+            "enum": ["draft", "released", "deprecated"],
+            "description": "The status of the edition."
+        },
+        "releaseDate": {
+            "type": "string",
+            "format": "date",
+            "description": "The release date of the edition. Use format `YYYY-MM-DD`. Required if status is 'released'."
+        },
+        "modules": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "A list of module identifiers included in this edition."
+        }
+    },
+    "required": ["id", "status", "modules"],
+    "allOf": [
+        {
+            "if": {
+                "properties": {
+                    "status": {
+                        "const": "released"
+                    }
+                }
+            },
+            "then": {
+                "required": ["releaseDate"]
+            }
+        }
+    ]
+}

@@ -4,19 +4,21 @@
     "private": true,
     "scripts": {
         "docusaurus": "docusaurus",
-        "start": "docusaurus start --port 20241",
-        "build": "docusaurus build",
+        "genEditions": "node src/generateEditionViews.mjs",
+        "start": "node src/editionHotReload.mjs",
+        "build": "npm run genEditions && docusaurus build",
         "swizzle": "docusaurus swizzle",
         "deploy": "docusaurus deploy",
         "clear": "docusaurus clear",
         "serve": "docusaurus serve",
-        "write-translations": "docusaurus write-translations",
+        "write-translations": "npm run genEditions && docusaurus write-translations",
         "write-heading-ids": "docusaurus write-heading-ids",
-        "typecheck": "tsc"
+        "typecheck": "npm run genEditions && tsc"
     },
     "dependencies": {
         "@docusaurus/core": "3.10.2",
         "@docusaurus/faster": "3.10.2",
+        "@docusaurus/plugin-content-docs": "^3.10.2",
         "@docusaurus/preset-classic": "3.10.2",
         "@docusaurus/theme-mermaid": "^3.10.2",
         "@mdx-js/react": "^3.0.0",

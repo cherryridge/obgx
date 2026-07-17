@@ -1,30 +1,17 @@
 import { ReactNode } from "react";
+import { translate } from "@docusaurus/Translate";
 import styles from "./index.module.css";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
 import Heading from "@theme/Heading";
-import Translate from "@docusaurus/Translate";
-import Link from "@docusaurus/Link";
 
 export default function Home() :ReactNode{
     const { siteConfig } = useDocusaurusContext();
     return(<Layout description="Homepage of OBGX documentation.">
         <header className={styles.banner}>
             <Heading as="h1" className="hero__title">{siteConfig.title}</Heading>
-            <p className="hero__subtitle">{siteConfig.tagline}</p>
-            <div style={{
-                display: "flex",
-                flexFlow: "row wrap",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "1rem"
-            }}>
-                <div className={styles.buttons}>
-                    <Link className="button button--secondary button--lg" to="overview">
-                        <Translate id="homepage.getStarted">Get Started From the Overview</Translate>
-                    </Link>
-                </div>
-            </div>
+            <div className="hero__subtitle">{translate({id: "homepage.tagline.1", message: "Documentation for the Open Block Game Extension Interface."})}</div>
+            <div className="hero__subtitle">{translate({id: "homepage.tagline.2", message: "Select an edition from the top-right dropdown to start."})}</div>
         </header>
     </Layout>);
 }

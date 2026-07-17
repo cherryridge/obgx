@@ -1,0 +1,10 @@
+{
+    "label": "record@1",
+    "link": {
+        "type": "doc",
+        "id": "index"
+    },
+    "customProps": {
+        "domain": "data-model"
+    }
+}

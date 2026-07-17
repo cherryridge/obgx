@@ -1,0 +1,23 @@
+---
+displayed_sidebar: sidebar
+---
+
+# Overview
+
+## About OBGX
+
+**O**pen **B**lock **G**ame E**x**tension Interface (**OBGX**) is an interface standard for building and extending block games from interoperable components, authored by different parties. It is designed to be a flexible and extensible framework that allows different developers to create and share game elements, resolve conflicts, and enable seamless integration of new features into existing games.
+
+## Characteristics
+
+- **Interoperability**: OBGX allows different game components developed by different and previously unknown developers to coexist and work together, with minimal friction and easy implementation for more complicated features, such as engine-level determinism.
+- **Platform Agnostic**: Although developed by CherryRidge and originates from the CherryGrove game framework, OBGX is designed to be platform agnostic, meaning it can be implemented in different existing or future block game engines, enabling content developers to target multiple games with a single implementation.
+- **Language Agnostic**: OBGX doesn't require developers to use a specific programming language to implement, or to use an existing interface. Even declarative languages such as JSON or YAML can be used to implement some of the simple modules.
+- **Extensibility**: OBGX does not limit implementers to a specific set or version of modules. Engine developers can implement their own vendored modules, and content developers can use it just like any other standard module.
+
+## Boundaries
+
+The following aspects of a block game engine's modding/datapack/content pack API are NOT in scope for OBGX:
+
+1. Pack-level identity. OBGX does not define how a content pack is identified, versioned or the dependency management.
+2. Pack-level interface interaction. OBGX does not specify how and when, one or many packs should interact with the interface. OBGX only defines the interface and the expected behavior of the engine, and the engine is free to decide how to manage the content packs' interaction.

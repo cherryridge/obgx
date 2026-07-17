@@ -1,0 +1,77 @@
+---
+displayed_sidebar: sidebar
+---
+
+# Terminology
+
+## Standard
+
+Refers to the whole OBGX.
+
+## Edition
+
+Refers to the periodic aggregate release of the OBGX standard. The current edition scheme is `[OBGX ]<yy>.<m>.` (`OBGX` is added when disambiguation is needed). For example: `OBGX 26.9` or `26.9` refers to the September 2026 release of the OBGX standard.
+
+## Draft
+
+Refers to a work-in-progress edition of the OBGX standard, which is not yet finalized and may be subject to change. Drafts are typically used for internal development and testing purposes, and are not considered stable or reliable for production use.
+
+Drafts are identified by the edition scheme followed by a `-draft` suffix. For example, `26.9-draft`.
+
+## Revision
+
+Refers to a subsequent correction to an edition of the OBGX standard. The current revision scheme is `[OBGX ]<yy>.<m>.<r>` (`OBGX` is added when disambiguation is needed). For example: `26.9.1` refers to the first revision of the September 2026 release of the OBGX standard.
+
+## Domain
+
+Refers to a specific area of functionality within the OBGX standard, divided by manual semantic boundaries.
+
+Current domains include:
+
+1. **Data Model**: Defines the data structures and formats used for representing OBGX understandable data.
+2. **Game Model**: Defines the game content and mechanics that can be implemented using OBGX, including blocks, entities, etc.
+3. **Presentation**: Defines the presentation layer of the game, including texts, textures, sounds, etc.
+4. **Interaction**: Defines the interaction layer of the game, including user input, GUI, and other interaction mechanisms.
+5. **Host Services**: Defines the out-of-game capabilities that can be provided, such as networking, storage, multimedia, and other services that can be used by the content packs.
+6. **Host Integration**: Defines the lower level integration of the game engine with content packs, possibly including render pipelines, network packets, and other engine-level integration points.
+7. **Diagnostics**: Defines the diagnostic and debugging capabilities that can be provided by the game engine to content packs, including logging, error reporting, profiling, and other diagnostic tools.
+
+## Module
+
+Refers to an independent unit of functionality within a domain, which can probably be implemented as a unit.
+
+Module is the core concept of OBGX, so important that they have their identifiers, and is the unit of versioning and dependency management.
+
+The scheme for module identifiers is `[<vendor>/]<moduleName>@<version>`, in which `<vendor>` and `<moduleName>` matches `^[a-z](?:[a-z0-9-]*[a-z0-9])?$`, and `<version>` matches `^[1-9][0-9]*$`.
+
+For example, `block@1` and `cherrygrove/block-layers@200` are valid module identifiers.
+
+The vendor is optional. An unqualified module is a standard module specified by the OBGX standard. A vendor-qualified module and an unqualified module with the same module name are distinct modules. For example, `block@1` and `cherrygrove/block@1` do not identify the same module.
+
+A specific version of a module can have dependencies on other modules, with specific versions or version ranges. The following forms of `<version>` are supported when describing dependencies:
+
+```
+4 (original form)
+>=4
+>4
+<=8
+<8
+>=4<8
+>=4<=8
+>4<=8
+>4<8
+```
+
+## Element
+
+Refers to an atomic unit of normative construct inside a module, which can be a data structure, a function, or a class.
+
+For example, `block@>=4<8` means the module `block` with version greater than or equal to 4 and less than 8, or allows `block@4`, `block@5`, `block@6`, and `block@7` to satisfy the dependency.
+
+## Host
+
+(Or **implementation**, when describing with the perspective of implementers) refers to a block game engine that implements any module of the OBGX standard, and is capable of loading and running content packs.
+
+## Pack
+
+(Or **content pack**) refers to a collection of interface usage code and static assets that can interact with any host that correctly implements any module of the OBGX standard.

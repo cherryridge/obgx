@@ -4,7 +4,6 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 const config :Config = {
     title: "OBGX Docs",
-    tagline: "Documentation for the Open Block Game Extension Interface.",
     favicon: "img/logo.png",
 
     future: {
@@ -36,10 +35,7 @@ const config :Config = {
 
     presets: [[
         "classic", {
-            docs: {
-                routeBasePath: "/",
-                sidebarPath: "./sidebars.ts"
-            },
+            docs: false,
             blog: {
                 routeBasePath: "/blog",
                 showReadingTime: true
@@ -47,6 +43,25 @@ const config :Config = {
             theme: { customCss: "./src/custom.css" }
         } satisfies Preset.Options
     ]],
+
+    plugins: [
+        [
+            "@docusaurus/plugin-content-docs", {
+                id: "edition",
+                path: ".generated/edition",
+                routeBasePath: "/",
+                sidebarPath: "./src/sidebars/sidebar.edition.ts"
+            }
+        ],
+        [
+            "@docusaurus/plugin-content-docs", {
+                id: "ref",
+                path: "modules",
+                routeBasePath: "ref",
+                sidebarPath: "./src/sidebars/sidebar.ref.ts"
+            }
+        ]
+    ],
 
     themeConfig: {
         colorMode: {
@@ -69,38 +84,12 @@ const config :Config = {
                 },
                 {
                     position: "left",
-                    label: "Data Model",
-                    to: "domain/data-model"
+                    label: "Reference",
+                    to: "ref"
                 },
                 {
-                    position: "left",
-                    label: "Game Model",
-                    to: "domain/game-model"
-                },
-                {
-                    position: "left",
-                    label: "Presentation",
-                    to: "domain/presentation"
-                },
-                {
-                    position: "left",
-                    label: "Interaction",
-                    to: "domain/interaction"
-                },
-                {
-                    position: "left",
-                    label: "Host Services",
-                    to: "domain/host-services"
-                },
-                {
-                    position: "left",
-                    label: "Host Integration",
-                    to: "domain/host-integration"
-                },
-                {
-                    position: "left",
-                    label: "Diagnostics",
-                    to: "domain/diagnostics"
+                    type: "custom-obgxEditionSelector",
+                    position: "right"
                 },
                 {
                     type: "localeDropdown",
@@ -117,15 +106,6 @@ const config :Config = {
                     ]
                 }
             ]
-        },
-        footer: {
-            style: "dark",
-            links: [],
-            copyright: `
-                <div style="padding-top:1rem">
-                    <div>Copyright © ${new Date().getFullYear()} CherryRidge.</div>
-                </div>
-            `,
         },
         prism: {
             theme: prismThemes.github,
