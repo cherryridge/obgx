@@ -21,7 +21,39 @@ interface RememberedSidebar extends StoredSidebar {
     locale: string;
 }
 
+type SharedSidebarSection = "global" | "footer";
+
 const rememberedSidebars = new Map<string, RememberedSidebar>();
+const sharedSidebarSectionKey = "obgxSharedSidebarSection";
+
+function sharedSidebarSection(item: PropSidebar[number]): SharedSidebarSection | undefined {
+    const section = item.customProps?.[sharedSidebarSectionKey];
+    return section === "global" || section === "footer" ? section : undefined;
+}
+
+function rememberedDynamicItems(items: PropSidebar): PropSidebar {
+    if (items.some(item => sharedSidebarSection(item) !== undefined)) {
+        return items.filter(item => sharedSidebarSection(item) === undefined);
+    }
+
+    const dynamicStart = items.findIndex(item => item.type !== "link");
+    if (dynamicStart < 0) return [];
+    return items.slice(dynamicStart, Math.max(dynamicStart, items.length - 2));
+}
+
+function refreshRememberedSidebar(
+    currentItems: PropSidebar,
+    rememberedSidebar: RememberedSidebar
+): RememberedSidebar {
+    const globalItems = currentItems.filter(item => sharedSidebarSection(item) === "global");
+    const footerItems = currentItems.filter(item => sharedSidebarSection(item) === "footer");
+    if (globalItems.length === 0 || footerItems.length === 0) return rememberedSidebar;
+
+    return {
+        ...rememberedSidebar,
+        items: [...globalItems, ...rememberedDynamicItems(rememberedSidebar.items), ...footerItems]
+    };
+}
 
 function storageKey(locale: string): string {
     return `obgx:last-documentation-sidebar:${locale}`;
@@ -68,8 +100,10 @@ export default function DocRoot(props: Props): ReactNode {
         if (isGlobalPage) {
             const sidebar = rememberedSidebars.get(currentLocale) ?? loadRememberedSidebar(currentLocale);
             if (sidebar !== undefined) {
-                rememberedSidebars.set(currentLocale, sidebar);
-                setRememberedSidebar(sidebar);
+                const refreshedSidebar = refreshRememberedSidebar(currentSidebar.sidebarItems, sidebar);
+                rememberedSidebars.set(currentLocale, refreshedSidebar);
+                setRememberedSidebar(refreshedSidebar);
+                saveRememberedSidebar(refreshedSidebar);
             }
             return;
         }

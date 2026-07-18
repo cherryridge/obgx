@@ -1,3 +1,5 @@
+import Compatable from "@site/src/components/Compatable";
+
 # `registerRecord`
 
 ## Summary
@@ -6,7 +8,7 @@ This function registers a new record to the host.
 
 ## Syntax
 
-
+`registerRecord(record: RecordDesc): bool | RegisterRecordResult`
 
 ## Description
 
@@ -18,10 +20,28 @@ This function registers a new record to the host.
 
 ## Compatibility
 
-
+<Compatable element="registerRecord" support={{
+    cherrygrove: {
+        status: "supported",
+        versionAdded: "1",
+        versionRemoved: "3",
+        notes: "The `registerRecord` function is fully supported in CherryGrove."
+    }
+}}
+subfeatures={[
+    {
+        name: "Returns `RegisterRecordResult`",
+        support: {
+            cherrygrove: {
+                status: "unsupported",
+                notes: "The `registerRecord` function returns `bool` instead of `RegisterRecordResult` in CherryGrove."
+            }
+        }
+    }
+]}
+/>
 
 ## Specifications
 
 
 ## See Also
-

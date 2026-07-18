@@ -6,6 +6,10 @@ import {generateEditionDocs} from "./generateEditionViews.mjs";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const docusaurusCli = path.join(projectRoot, "node_modules", "@docusaurus", "core", "bin", "docusaurus.mjs");
+const siteConfigPath = path.join(projectRoot, "docusaurus.config.ts");
+const sidebarsRoot = path.join(projectRoot, "src", "sidebars");
+const sidebarEntryPaths = ["sidebar.edition.ts", "sidebar.ref.ts"]
+    .map(fileName => path.join(sidebarsRoot, fileName));
 const sourceRoots = ["globals", "editions", "modules"]
     .map(relativePath => path.join(projectRoot, relativePath))
     .filter(sourcePath => fs.existsSync(sourcePath));
@@ -15,6 +19,7 @@ if (fs.existsSync(i18nRoot)) sourceRoots.push(i18nRoot);
 generateEditionDocs();
 
 let regenerationTimer;
+let sidebarReloadTimer;
 function scheduleRegeneration(changedPath) {
     if (changedPath.replaceAll(path.sep, "/").includes("docusaurus-plugin-content-docs-edition/current")) return;
     clearTimeout(regenerationTimer);
@@ -28,10 +33,24 @@ function scheduleRegeneration(changedPath) {
     }, 100);
 }
 
+function scheduleSidebarReload(changedPath) {
+    if (sidebarEntryPaths.includes(changedPath)) return;
+    clearTimeout(sidebarReloadTimer);
+    sidebarReloadTimer = setTimeout(() => {
+        const now = new Date();
+        fs.utimesSync(siteConfigPath, now, now);
+    }, 100);
+}
+
 const watchers = sourceRoots.map(sourceRoot => fs.watch(
     sourceRoot,
     {recursive: true},
     (_eventType, fileName) => scheduleRegeneration(path.join(sourceRoot, fileName?.toString() ?? ""))
+));
+watchers.push(fs.watch(
+    sidebarsRoot,
+    {recursive: true},
+    (_eventType, fileName) => scheduleSidebarReload(path.join(sidebarsRoot, fileName?.toString() ?? ""))
 ));
 
 const forwardedArguments = process.argv.slice(2);
@@ -44,6 +63,7 @@ const child = spawn(
 
 function closeWatchers() {
     clearTimeout(regenerationTimer);
+    clearTimeout(sidebarReloadTimer);
     for (const watcher of watchers) watcher.close();
 }
 

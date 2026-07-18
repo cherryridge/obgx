@@ -1,0 +1,190 @@
+.compatibility {
+    margin: 1rem 0;
+    overflow: hidden;
+    border: 1px solid var(--ifm-table-border-color);
+    border-radius: var(--ifm-global-radius);
+    background: var(--ifm-background-surface-color);
+}
+
+.scroller {
+    overflow-x: auto;
+}
+
+.table {
+    display: table;
+    width: 100%;
+    min-width: 32rem;
+    margin: 0;
+    border: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+}
+
+.table :where(th, td) {
+    padding: .8rem 1rem;
+    border: 0;
+    border-right: 1px solid var(--ifm-table-border-color);
+    border-bottom: 1px solid var(--ifm-table-border-color);
+}
+
+.table :where(th, td):last-child {
+    border-right: 0;
+}
+
+.table tbody tr:last-child :where(th, td) {
+    border-bottom: 0;
+}
+
+.rowHeader {
+    width: 34%;
+    text-align: left;
+    background: var(--ifm-background-surface-color);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.rowHeader > :first-child {
+    margin-top: 0;
+}
+
+.rowHeader > :last-child {
+    margin-bottom: 0;
+}
+
+.supportCell {
+    --compatibility-accent: var(--ifm-color-emphasis-600);
+    --compatibility-background: var(--ifm-color-emphasis-100);
+    color: var(--ifm-font-color-base);
+    background: var(--compatibility-background);
+    text-align: center;
+    vertical-align: middle;
+}
+
+.supported {
+    --compatibility-accent: #18794e;
+    --compatibility-background: rgba(24, 121, 78, .12);
+}
+
+.partial {
+    --compatibility-accent: #9a6700;
+    --compatibility-background: rgba(210, 153, 34, .16);
+}
+
+.unsupported {
+    --compatibility-accent: #cf222e;
+    --compatibility-background: rgba(207, 34, 46, .11);
+}
+
+.unknown {
+    --compatibility-accent: var(--ifm-color-emphasis-600);
+    --compatibility-background: var(--ifm-color-emphasis-100);
+}
+
+.primaryLine,
+.statusLine {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.primaryLine {
+    gap: .5rem;
+}
+
+.statusLine {
+    gap: .35rem;
+    margin-top: .35rem;
+    color: var(--ifm-color-emphasis-800);
+    font-family: var(--ifm-font-family-monospace);
+    font-size: .8rem;
+    font-weight: 400;
+    line-height: 1.3;
+}
+
+.statusSymbol {
+    display: inline-grid;
+    flex: 0 0 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    place-items: center;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    color: var(--compatibility-accent);
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.version {
+    color: var(--compatibility-accent);
+    font-family: var(--ifm-font-family-base);
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.noteReference {
+    margin-left: -.15rem;
+    font-size: .7rem;
+    line-height: 1;
+}
+
+.noteReference a {
+    color: var(--ifm-link-color);
+}
+
+.notesSection {
+    padding: .75rem 1rem;
+    border-top: 1px solid var(--ifm-table-border-color);
+    font-size: .85rem;
+}
+
+.notes {
+    margin: 0;
+    padding-left: 1.4rem;
+}
+
+.notes li + li {
+    margin-top: .35rem;
+}
+
+.noteContent > :first-child {
+    margin-top: 0;
+}
+
+.noteContent > :last-child {
+    margin-bottom: 0;
+}
+
+.visuallyHidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+:global(html[data-theme="dark"]) .supported {
+    --compatibility-accent: #56d364;
+    --compatibility-background: rgba(46, 160, 67, .18);
+}
+
+:global(html[data-theme="dark"]) .partial {
+    --compatibility-accent: #e3b341;
+    --compatibility-background: rgba(187, 128, 9, .22);
+}
+
+:global(html[data-theme="dark"]) .unsupported {
+    --compatibility-accent: #ff7b72;
+    --compatibility-background: rgba(248, 81, 73, .18);
+}
+
+@media (max-width: 576px) {
+    .table :where(th, td) {
+        padding: .7rem .8rem;
+    }
+}

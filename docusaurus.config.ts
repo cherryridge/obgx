@@ -88,6 +88,11 @@ const config :Config = {
                     to: "ref"
                 },
                 {
+                    position: "left",
+                    label: "Blog",
+                    to: "blog"
+                },
+                {
                     type: "custom-obgxEditionSelector",
                     position: "right"
                 },

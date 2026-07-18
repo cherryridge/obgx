@@ -142,12 +142,17 @@ export default function EditionSelector({mobile, position, onClick}: SelectorPro
         id: "editionSelector.allModules.label",
         message: "All Modules"
     }) : selectedEdition?.id ?? data.defaultEdition;
+    const currentEditionIsDeprecated = effectiveRoute.view !== "reference" &&
+        selectedEdition?.status === "deprecated";
     const items: LinkLikeNavbarItemProps[] = [
         ...data.editions.map(edition => ({
             label: edition.id,
             to: resolveTarget(effectiveRoute, edition.id, data),
-            className: clsx(effectiveRoute.view === "edition" &&
-                effectiveRoute.edition === edition.id && styles.activeItem)
+            className: clsx(
+                effectiveRoute.view === "edition" &&
+                    effectiveRoute.edition === edition.id && styles.activeItem,
+                edition.status === "deprecated" && styles.deprecatedItem
+            )
         })),
         {
             type: "html",
@@ -166,6 +171,6 @@ export default function EditionSelector({mobile, position, onClick}: SelectorPro
         onClick={onClick}
         label={currentLabel}
         items={items}
-        className={styles.trigger}
+        className={clsx(styles.trigger, currentEditionIsDeprecated && styles.deprecatedItem)}
     />;
 }

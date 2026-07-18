@@ -62,11 +62,13 @@ A specific version of a module can have dependencies on other modules, with spec
 >4<8
 ```
 
+For example, `block@>=4<8` means the module `block` with version greater than or equal to 4 and less than 8, or allows `block@4`, `block@5`, `block@6`, and `block@7` to satisfy the dependency.
+
 ## Element
 
 Refers to an atomic unit of normative construct inside a module, which can be a data structure, a function, or a class.
 
-For example, `block@>=4<8` means the module `block` with version greater than or equal to 4 and less than 8, or allows `block@4`, `block@5`, `block@6`, and `block@7` to satisfy the dependency.
+An element must belong to one version of a module. The scheme for element identifiers is `<module-scheme>/<elementName>`, in which `<elementName>` matches `^[a-z_][a-z0-9_]*$`.
 
 ## Host
 

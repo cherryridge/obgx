@@ -1,0 +1,163 @@
+---
+displayed_sidebar: sidebar
+
+---
+
+# Syntax
+
+OBGX uses a standardized syntax for defining and representing interfaces.
+
+## General
+
+Comments:
+
+```
+//Line comment
+/*
+Multi-line comment
+*/
+```
+
+Declaring an object with a type:
+
+```
+obj: type;
+```
+
+Declaring a compound type:
+
+```
+type TypeName = {
+    field1: type1,
+    field2: type2
+};
+```
+
+Accessing a field of an object:
+
+```
+obj.field1
+```
+
+Declaring a function with a return type:
+
+```
+funcName(param1: type1, param2: type2): returnType;
+```
+
+Or:
+
+```
+funcName: (param1: type1, param2: type2) => returnType;
+```
+
+## Fundamental Types
+
+OBGX uses the following fundamental types to represent data in a standardized way.
+
+Note that some of the fundamental types don't have a specification in their implementation. This is intended to allow for more flexibility when implementing them in some languages.
+
+### Integer
+
+#### Signed integer
+
+```
+i8
+i16
+i32
+i64
+```
+
+The number after `i` indicates the range of the type. Specifically:
+
+1. `i8` is a signed integer with a range of `-128` to `127`.
+2. `i16` is a signed integer with a range of `-32,768` to `32,767`.
+3. `i32` is a signed integer with a range of `-2,147,483,648` to `2,147,483,647`.
+4. `i64` is a signed integer with a range of `-9,223,372,036,854,775,808` to `9,223,372,036,854,775,807`.
+
+All signed integers wrap to the minimum value when arithmetic operations exceed the maximum value, and vice versa.
+
+OBGX doesn't specify the underlying representation of signed integers, such as bit format, endianness, or memory alignment.
+
+#### Unsigned integer
+
+```
+u8
+u16
+u32
+u64
+```
+
+The number after `u` indicates the range of the type. Specifically:
+
+1. `u8` is an unsigned integer with a range of `0` to `255`.
+2. `u16` is an unsigned integer with a range of `0` to `65,535`.
+3. `u32` is an unsigned integer with a range of `0` to `4,294,967,295`.
+4. `u64` is an unsigned integer with a range of `0` to `18,446,744,073,709,551,615`.
+
+All unsigned integers wrap to zero when arithmetic operations exceed the maximum value, and vice versa.
+
+OBGX also doesn't specify the underlying representation of unsigned integers.
+
+### Float
+
+```
+f32
+f64
+```
+
+Floats follow the IEEE 754 standard for arithmetic operations, including rounding, overflow, underflow, and special values such as `NaN` and `Infinity`.
+
+However, OBGX still don't specify the underlying representation of floats. Following the IEEE 754 standard is recommended, but not required.
+
+### Enum
+
+Declaration:
+
+```
+enum TypeName {
+    Value1,
+    Value2
+}
+```
+
+Usage:
+
+```
+instance: TypeName;
+```
+
+Enums don't have a specific size, and the underlying representation is implementation-defined.
+
+### Array
+
+```
+array<type, length>
+```
+
+Arrays should be sequentially indexable by unsigned integers with the first element at index 0 and the last element at index `length - 1`.
+
+Arrays should have a fixed length and should return an error when accessing an index out of bounds.
+
+Host should provide at least one way to get the length of an array when the length is not known at compile time. Using the standardized `types` module is recommended.
+
+Arrays don't require continuous memory allocation, and the underlying representation is implementation-defined.
+
+### Variable-size
+
+```
+vector<type>
+```
+
+Vectors are similar to arrays, but they can have a variable length. The length of a vector can be changed at runtime.
+
+Vectors can have an implementation-defined maximum allowable length. If not, the assumed maximum length is the maximum value of `u64`; else, the host should provide a way to get the maximum length of a vector.
+
+Host should provide at least one way to get the length of a vector. Using the standardized `types` module is recommended.
+
+Vectors don't require continuous memory allocation, and the underlying representation is implementation-defined.
+
+```
+string
+```
+(UTF-8 encoded)

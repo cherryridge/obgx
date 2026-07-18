@@ -15,9 +15,8 @@ const domains = [
 
 const editions = fs
     .readdirSync(path.join(process.cwd(), "editions"), {withFileTypes: true})
-    .filter(entry => entry.isDirectory())
-    .filter(entry => fs.existsSync(path.join(process.cwd(), "editions", entry.name, "index.json")))
-    .map(entry => readJson<{id: string; modules: string[]}>(`editions/${entry.name}/index.json`));
+    .filter(entry => entry.isFile() && entry.name !== "schema.json" && entry.name.endsWith(".json"))
+    .map(entry => readJson<{id: string; modules: string[]}>(`editions/${entry.name}`));
 
 function createEditionItems(editionIdentifier: string): SidebarItems {
     const edition = editions.find(candidate => candidate.id === editionIdentifier);

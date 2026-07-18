@@ -4,6 +4,18 @@ import type {SidebarsConfig} from "@docusaurus/plugin-content-docs";
 
 export type SidebarItems = Extract<SidebarsConfig[string], unknown[]>;
 
+const sharedSidebarSectionKey = "obgxSharedSidebarSection";
+
+function sharedSidebarItem<T extends object>(
+    item: T,
+    section: "global" | "footer"
+): T & {customProps: Readonly<Record<string, unknown>>} {
+    const customProps = "customProps" in item && typeof item.customProps === "object" && item.customProps !== null
+        ? item.customProps
+        : {};
+    return {...item, customProps: {...customProps, [sharedSidebarSectionKey]: section}};
+}
+
 const modulesRoot = path.join(process.cwd(), "modules");
 export const divider = {
     type: "html" as const,
@@ -54,19 +66,25 @@ export function createSidebarWith(dynamicItems: SidebarItems): SidebarItems {
     const globalItems: SidebarItems = [
         {type: "link", label: "Overview", href: "/overview"},
         {type: "link", label: "Terminology", href: "/terminology"},
+        {type: "link", label: "Syntax", href: "/syntax"},
         {type: "link", label: "Contributing", href: "/contributing"}
     ];
 
     return [
-        ...globalItems,
+        ...globalItems.map(item => {
+            if (typeof item !== "object" || !("type" in item)) {
+                throw new Error("Global sidebar items must use the expanded object syntax.");
+            }
+            return sharedSidebarItem(item, "global");
+        }),
         ...dynamicItems,
-        divider,
-        {
-            type: "html",
+        sharedSidebarItem(divider, "footer"),
+        sharedSidebarItem({
+            type: "html" as const,
             value: `<div style="padding-top:1rem;text-align:center;font-size:.9rem;color:var(--ifm-color-emphasis-700);">
                 <div>Copyright &copy; ${new Date().getFullYear()} CherryRidge.</div>
-                <div><a href="https://github.com/cherryridge/obgx" target="_blank">GitHub</a></div>
+                <div><a href="https://github.com/cherryridge/obgx" target="_blank">GitHub</a> · <a href="https://docs.cherrygrove.dev" target="_blank">CherryGrove</a></div>
             </div>`
-        }
+        }, "footer")
     ];
 }

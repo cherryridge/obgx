@@ -1,7 +1,8 @@
 {
-    "$schema": "../schema.json",
+    "$schema": "schema.json",
     "id": "26.8-draft",
     "status": "draft",
+    "announcement": "announcement/26.8-draft",
     "modules": [
         "record@1"
     ]

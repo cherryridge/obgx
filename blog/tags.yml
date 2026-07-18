@@ -3,9 +3,9 @@ general:
   permalink: /general
   description: General updates and news about OBGX.
 
-release:
-  label: Release
-  permalink: /release
+announcement:
+  label: Announcement
+  permalink: /announcement
   description: Announcements and updates about new edition releases and revisions in OBGX.
 
 feature:

@@ -10,6 +10,7 @@ const generatedRoot = path.join(projectRoot, ".generated", "edition");
 const stagedRoot = path.join(projectRoot, ".generated", "edition.next");
 const generatedDataPath = path.join(projectRoot, ".generated", "editionData.ts");
 const moduleIdentifierPattern = /^[a-z](?:[a-z0-9-]*[a-z0-9])?@[1-9][0-9]*$/;
+const editionIdentifierPattern = /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:\.(0|[1-9][0-9]*))?(-draft)?$/;
 
 function compareModuleIdentifiers(left, right) {
     const leftAt = left.lastIndexOf("@");
@@ -22,37 +23,102 @@ function compareModuleIdentifiers(left, right) {
     return leftVersion < rightVersion ? -1 : leftVersion > rightVersion ? 1 : 0;
 }
 
-function compareEditionIds(left, right) {
-    const leftParts = left.replace(/-draft$/, "").split(".").map(Number);
-    const rightParts = right.replace(/-draft$/, "").split(".").map(Number);
-    for (let index = 0; index < Math.max(leftParts.length, rightParts.length); index += 1) {
-        const difference = (leftParts[index] ?? 0) - (rightParts[index] ?? 0);
-        if (difference !== 0) return difference;
+function parseEditionIdentifier(identifier) {
+    const match = editionIdentifierPattern.exec(identifier);
+    if (match === null) {
+        throw new Error(
+            `[OBGX] Invalid Edition identifier: ${identifier}. ` +
+            "Expected <yy>.<m>[.<r>][-draft] with no leading zeroes."
+        );
     }
-    return left < right ? -1 : left > right ? 1 : 0;
+
+    return {
+        numbers: [BigInt(match[1]), BigInt(match[2]), match[3] === undefined ? 0n : BigInt(match[3])],
+        draft: match[4] !== undefined
+    };
+}
+
+export function compareEditionIds(left, right) {
+    const leftEdition = parseEditionIdentifier(left);
+    const rightEdition = parseEditionIdentifier(right);
+    for (let index = 0; index < leftEdition.numbers.length; index += 1) {
+        if (leftEdition.numbers[index] > rightEdition.numbers[index]) return -1;
+        if (leftEdition.numbers[index] < rightEdition.numbers[index]) return 1;
+    }
+    return Number(leftEdition.draft) - Number(rightEdition.draft);
 }
 
 function readJson(relativePath) {
     return JSON.parse(fs.readFileSync(path.join(projectRoot, relativePath), "utf8"));
 }
 
+function markdownLink(label, href) {
+    const escapedLabel = label.replaceAll("\\", "\\\\").replaceAll("[", "\\[").replaceAll("]", "\\]");
+    const escapedHref = href.replaceAll(">", "%3E").replaceAll(" ", "%20");
+    return `[${escapedLabel}](<${escapedHref}>)`;
+}
+
+function resolveAnnouncementHref(announcement) {
+    return /^(?:[a-z][a-z0-9+.-]*:|\/)/i.test(announcement)
+        ? announcement
+        : `/blog/${announcement}`;
+}
+
+function createEditionLandingPage(edition, modules) {
+    const announcement = edition.announcement === undefined
+        ? "None"
+        : markdownLink(edition.announcement, resolveAnnouncementHref(edition.announcement));
+    const moduleItems = edition.modules.length === 0
+        ? ["_No modules._"]
+        : edition.modules.map(moduleIdentifier => {
+            const module = modules.get(moduleIdentifier);
+            return `- [\`${moduleIdentifier}\`](<./${moduleIdentifier}/${module.landingFileName}>)`;
+        });
+
+    return [
+        `# ${edition.id}`,
+        "",
+        `- **ID:** \`${edition.id}\``,
+        `- **Status:** \`${edition.status}\``,
+        `- **Announcement:** ${announcement}`,
+        "",
+        "<details>",
+        "<summary>Modules</summary>",
+        "",
+        ...moduleItems,
+        "",
+        "</details>"
+    ].join("\r\n");
+}
+
+function writeEditionLandingPage(targetRoot, edition, modules) {
+    fs.writeFileSync(
+        path.join(targetRoot, "index.mdx"),
+        createEditionLandingPage(edition, modules),
+        "utf8"
+    );
+}
+
+function findLandingFileName(directory) {
+    return ["index.mdx", "index.md"]
+        .find(fileName => fs.existsSync(path.join(directory, fileName)));
+}
+
 function loadEditions() {
     const modules = new Map();
     const editions = fs.readdirSync(editionsRoot, {withFileTypes: true})
-        .filter(entry => entry.isDirectory())
-        .filter(entry => fs.existsSync(path.join(editionsRoot, entry.name, "index.json")))
+        .filter(entry => entry.isFile() && entry.name !== "schema.json" && entry.name.endsWith(".json"))
         .map(entry => {
-            const manifestPath = `editions/${entry.name}/index.json`;
+            const editionIdentifier = entry.name.slice(0, -".json".length);
+            const manifestPath = `editions/${entry.name}`;
             const manifest = readJson(manifestPath);
-            if (manifest.id !== entry.name || typeof manifest.id !== "string" || !Array.isArray(manifest.modules)) {
+            if (manifest.id !== editionIdentifier || typeof manifest.id !== "string" || !Array.isArray(manifest.modules)) {
                 throw new Error(`[OBGX] Invalid manifest: ${manifestPath}.`);
             }
-
-            const sourceDirectory = path.join(editionsRoot, entry.name);
-            const landingFileName = ["index.mdx", "index.md"]
-                .find(fileName => fs.existsSync(path.join(sourceDirectory, fileName)));
-            if (landingFileName === undefined) {
-                throw new Error(`[OBGX] Edition ${manifest.id} must have an index.md or index.mdx.`);
+            parseEditionIdentifier(manifest.id);
+            if (manifest.announcement !== undefined &&
+                (typeof manifest.announcement !== "string" || manifest.announcement.length === 0)) {
+                throw new Error(`[OBGX] Edition ${manifest.id} has an invalid announcement.`);
             }
 
             for (const moduleIdentifier of manifest.modules) {
@@ -63,17 +129,18 @@ function loadEditions() {
 
                 const moduleSourceDirectory = path.join(modulesRoot, moduleIdentifier);
                 const category = readJson(`modules/${moduleIdentifier}/_category_.json`);
+                const landingFileName = findLandingFileName(moduleSourceDirectory);
                 if (typeof category.customProps?.domain !== "string") {
                     throw new Error(`[OBGX] ${moduleIdentifier}/_category_.json must define customProps.domain.`);
                 }
-                if (!fs.existsSync(path.join(moduleSourceDirectory, "index.mdx")) && !fs.existsSync(path.join(moduleSourceDirectory, "index.md"))) {
+                if (landingFileName === undefined) {
                     throw new Error(`[OBGX] ${moduleIdentifier} must have an index.md or index.mdx.`);
                 }
 
-                modules.set(moduleIdentifier, {sourceDirectory: moduleSourceDirectory});
+                modules.set(moduleIdentifier, {sourceDirectory: moduleSourceDirectory, landingFileName});
             }
 
-            return {...manifest, sourceDirectory, landingFileName};
+            return manifest;
         });
 
     const drafts = editions.filter(edition => edition.status === "draft");
@@ -120,10 +187,7 @@ function projectDefaultDocs(editions, modules) {
     for (const edition of editions) {
         const editionRoot = path.join(stagedRoot, edition.id);
         fs.mkdirSync(editionRoot, {recursive: true});
-        fs.copyFileSync(
-            path.join(edition.sourceDirectory, edition.landingFileName),
-            path.join(editionRoot, edition.landingFileName)
-        );
+        writeEditionLandingPage(editionRoot, edition, modules);
 
         for (const moduleIdentifier of edition.modules) {
             fs.cpSync(
@@ -194,18 +258,21 @@ function projectTranslations(editions, modules) {
         for (const edition of editions) {
             const editionRoot = path.join(targetRoot, edition.id);
             fs.mkdirSync(editionRoot, {recursive: true});
-            fs.copyFileSync(
-                path.join(edition.sourceDirectory, edition.landingFileName),
-                path.join(editionRoot, edition.landingFileName)
-            );
+            const localizedModules = new Map();
 
             for (const moduleIdentifier of edition.modules) {
                 const translatedModule = path.join(moduleSourceRoot, moduleIdentifier);
                 const sourceDirectory = fs.existsSync(translatedModule)
                     ? translatedModule
                     : modules.get(moduleIdentifier).sourceDirectory;
+                const landingFileName = findLandingFileName(sourceDirectory);
+                if (landingFileName === undefined) {
+                    throw new Error(`[OBGX] ${sourceDirectory} must have an index.md or index.mdx.`);
+                }
+                localizedModules.set(moduleIdentifier, {sourceDirectory, landingFileName});
                 fs.cpSync(sourceDirectory, path.join(editionRoot, moduleIdentifier), {recursive: true});
             }
+            writeEditionLandingPage(editionRoot, edition, localizedModules);
         }
     }
 }
@@ -220,7 +287,7 @@ function writeEditionData(defaultEdition, editions) {
                 ...(typeof edition.releaseDate === "string" ? {releaseDate: edition.releaseDate} : {}),
                 modules: edition.modules
             }))
-            .sort((left, right) => compareEditionIds(right.id, left.id)),
+            .sort((left, right) => compareEditionIds(left.id, right.id)),
         modules: fs.readdirSync(modulesRoot, {withFileTypes: true})
             .filter(entry => entry.isDirectory())
             .filter(entry => fs.existsSync(path.join(modulesRoot, entry.name, "_category_.json")))
