@@ -40,7 +40,7 @@ function createEditionItems(editionIdentifier: string): SidebarItems {
     });
     return [
         divider,
-        {type: "doc", id: `${edition.id}/index`, label: edition.id},
+        {type: "doc", id: `${edition.id}/index`, label: `${edition.id} Overview`},
         ...domainItems
     ];
 }
