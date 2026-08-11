@@ -1,47 +1,26 @@
-import Compatable from "@site/src/components/Compatable";
-
-# `registerRecord`
-
-## Summary
+---
+type: function
+---
 
 This function registers a new record to the host.
 
-## Syntax
-
-`registerRecord(record: RecordDesc): bool | RegisterRecordResult`
+```obgx
+// !link[/RecordDesc/] RecordDesc
+// !link[/RegisterRecordResult/] RegisterRecordResult
+registerRecord(record: RecordDesc): RegisterRecordResult;
+```
 
 ## Description
 
-
+This function is the way to register a record.
 
 ## Examples
-
-
-
-## Compatibility
 
 <Compatable element="registerRecord" support={{
     cherrygrove: {
         status: "supported",
-        versionAdded: "1",
-        versionRemoved: "3",
-        notes: "The `registerRecord` function is fully supported in CherryGrove."
+        versionAdded: "1"
     }
-}}
-subfeatures={[
-    {
-        name: "Returns `RegisterRecordResult`",
-        support: {
-            cherrygrove: {
-                status: "unsupported",
-                notes: "The `registerRecord` function returns `bool` instead of `RegisterRecordResult` in CherryGrove."
-            }
-        }
-    }
-]}
-/>
-
-## Specifications
-
+}}/>
 
 ## See Also

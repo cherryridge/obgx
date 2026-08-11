@@ -5,13 +5,13 @@ displayed_sidebar: sidebar
 
 # Syntax
 
-OBGX uses a standardized syntax for defining and representing interfaces.
+OBGX uses a set of standardized syntax for defining and representing interfaces.
 
 ## General
 
 Comments:
 
-```
+```obgx
 //Line comment
 /*
 Multi-line comment
@@ -20,34 +20,43 @@ Multi-line comment
 
 Declaring an object with a type:
 
-```
-obj: type;
+```obgx
+obj: objType;
 ```
 
-Declaring a compound type:
+Declaring a compound type with the `type` keyword:
 
+```obgx
+type TypeName {
+    field1: type1;
+    field2: type2;
+};
 ```
-type TypeName = {
-    field1: type1,
-    field2: type2
+
+Declaring an enum with the `enum` keyword:
+
+```obgx
+enum EnumName {
+    Value1,
+    Value2
 };
 ```
 
 Accessing a field of an object:
 
-```
+```obgx
 obj.field1
 ```
 
 Declaring a function with a return type:
 
-```
+```obgx
 funcName(param1: type1, param2: type2): returnType;
 ```
 
-Or:
+Or when used as a type:
 
-```
+```obgx
 funcName: (param1: type1, param2: type2) => returnType;
 ```
 
@@ -61,7 +70,7 @@ Note that some of the fundamental types don't have a specification in their impl
 
 #### Signed integer
 
-```
+```obgx
 i8
 i16
 i32
@@ -77,11 +86,11 @@ The number after `i` indicates the range of the type. Specifically:
 
 All signed integers wrap to the minimum value when arithmetic operations exceed the maximum value, and vice versa.
 
-OBGX doesn't specify the underlying representation of signed integers, such as bit format, endianness, or memory alignment.
+OBGX doesn't specify the underlying representation of signed integers, such as bit format, endianness, or memory alignment, although the types are named after their expected bit sizes.
 
 #### Unsigned integer
 
-```
+```obgx
 u8
 u16
 u32
@@ -101,41 +110,51 @@ OBGX also doesn't specify the underlying representation of unsigned integers.
 
 ### Float
 
-```
+```obgx
 f32
 f64
 ```
 
 Floats follow the IEEE 754 standard for arithmetic operations, including rounding, overflow, underflow, and special values such as `NaN` and `Infinity`.
 
-However, OBGX still don't specify the underlying representation of floats. Following the IEEE 754 standard is recommended, but not required.
+However, OBGX still doesn't specify the underlying representation of floats. Following the IEEE 754 standard is recommended, but not required.
+
+### Boolean
+
+```obgx
+boolean
+```
+
+Booleans can only have two values: `true` or `false`. The underlying representation is implementation-defined.
 
 ### Enum
 
 Declaration:
 
-```
+```obgx
 enum TypeName {
     Value1,
     Value2
-}
+};
 ```
 
 Usage:
 
-```
+```obgx
 instance: TypeName;
 ```
 
 Enums don't have a specific size, and the underlying representation is implementation-defined.
 
-### Array
+### Container
 
-```
-array<type, length>
+#### Array
+
+```obgx
+elementType[length]
 ```
 
-Arrays should be sequentially indexable by unsigned integers with the first element at index 0 and the last element at index `length - 1`.
+Arrays should be sequentially indexable by unsigned integers with the first element at index `0` and the last element at index `length - 1`.
 
 Arrays should have a fixed length and should return an error when accessing an index out of bounds.
 
@@ -143,21 +162,59 @@ Host should provide at least one way to get the length of an array when the leng
 
 Arrays don't require continuous memory allocation, and the underlying representation is implementation-defined.
 
-### Variable-size
+#### Vector
 
-```
-vector<type>
+```obgx
+elementType[]
 ```
 
 Vectors are similar to arrays, but they can have a variable length. The length of a vector can be changed at runtime.
 
-Vectors can have an implementation-defined maximum allowable length. If not, the assumed maximum length is the maximum value of `u64`; else, the host should provide a way to get the maximum length of a vector.
+Vectors should have a maximum possible length of `u64`.
 
 Host should provide at least one way to get the length of a vector. Using the standardized `types` module is recommended.
 
 Vectors don't require continuous memory allocation, and the underlying representation is implementation-defined.
 
-```
+#### String
+
+```obgx
 string
 ```
-(UTF-8 encoded)
+
+Strings follow the UTF-8 encoding standard when observed from the outside. The underlying representation is implementation-defined.
+
+### Function Value
+
+Functions can be passed as values in OBGX.
+
+```obgx
+funcName: (param1: type1, param2: type2) => returnType;
+```
+
+Implementations can choose to implement function values as true functions, which often suits programming languages, or as references to functions, which often suits declarative languages.
+
+For example, this implementation choice in JSON is valid:
+
+```json
+"some_interface": {
+    "arg1": 42,
+    "arg2": "hello",
+    "arg3_func_arg": "function_name_refering_to_a_function_somewhere"
+}
+```
+
+### Opaque Handle
+
+Represent any data type that cannot be represented in OBGX, typically because the data type is implementation-defined.
+
+```obgx
+hndl(semanticName)
+```
+
+Handles can have a semantic name, which is represented as a string literal. The semantic name is **only used to clarify the purpose of the handle** and doesn't make the underlying representation of the handle different.
+
+The underlying representation of handles is implementation-defined.
+
+## Fault
+

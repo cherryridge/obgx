@@ -9,6 +9,7 @@ const modulesRoot = path.join(projectRoot, "modules");
 const generatedRoot = path.join(projectRoot, ".generated", "edition");
 const stagedRoot = path.join(projectRoot, ".generated", "edition.next");
 const generatedDataPath = path.join(projectRoot, ".generated", "editionData.ts");
+const moduleLandingFileName = "_index.mdx";
 const moduleIdentifierPattern = /^[a-z](?:[a-z0-9-]*[a-z0-9])?@[1-9][0-9]*$/;
 const editionIdentifierPattern = /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:\.(0|[1-9][0-9]*))?(-draft)?$/;
 
@@ -64,16 +65,15 @@ function resolveAnnouncementHref(announcement) {
         : `/blog/${announcement}`;
 }
 
-function createEditionLandingPage(edition, modules) {
+function createEditionLandingPage(edition) {
     const announcement = edition.announcement === undefined
         ? "None"
         : markdownLink(edition.announcement, resolveAnnouncementHref(edition.announcement));
     const moduleItems = edition.modules.length === 0
         ? ["_No modules._"]
-        : edition.modules.map(moduleIdentifier => {
-            const module = modules.get(moduleIdentifier);
-            return `- [\`${moduleIdentifier}\`](<./${moduleIdentifier}/${module.landingFileName}>)`;
-        });
+        : edition.modules.map(moduleIdentifier =>
+            `- [\`${moduleIdentifier}\`](<./${moduleIdentifier}/${moduleLandingFileName}>)`
+        );
 
     return [
         `# ${edition.id}`,
@@ -91,17 +91,12 @@ function createEditionLandingPage(edition, modules) {
     ].join("\r\n");
 }
 
-function writeEditionLandingPage(targetRoot, edition, modules) {
+function writeEditionLandingPage(targetRoot, edition) {
     fs.writeFileSync(
         path.join(targetRoot, "index.mdx"),
-        createEditionLandingPage(edition, modules),
+        createEditionLandingPage(edition),
         "utf8"
     );
-}
-
-function findLandingFileName(directory) {
-    return ["index.mdx", "index.md"]
-        .find(fileName => fs.existsSync(path.join(directory, fileName)));
 }
 
 function loadEditions() {
@@ -129,15 +124,14 @@ function loadEditions() {
 
                 const moduleSourceDirectory = path.join(modulesRoot, moduleIdentifier);
                 const category = readJson(`modules/${moduleIdentifier}/_category_.json`);
-                const landingFileName = findLandingFileName(moduleSourceDirectory);
                 if (typeof category.customProps?.domain !== "string") {
                     throw new Error(`[OBGX] ${moduleIdentifier}/_category_.json must define customProps.domain.`);
                 }
-                if (landingFileName === undefined) {
-                    throw new Error(`[OBGX] ${moduleIdentifier} must have an index.md or index.mdx.`);
+                if (!fs.existsSync(path.join(moduleSourceDirectory, moduleLandingFileName))) {
+                    throw new Error(`[OBGX] ${moduleIdentifier} must have a ${moduleLandingFileName}.`);
                 }
 
-                modules.set(moduleIdentifier, {sourceDirectory: moduleSourceDirectory, landingFileName});
+                modules.set(moduleIdentifier, {sourceDirectory: moduleSourceDirectory});
             }
 
             return manifest;
@@ -187,7 +181,7 @@ function projectDefaultDocs(editions, modules) {
     for (const edition of editions) {
         const editionRoot = path.join(stagedRoot, edition.id);
         fs.mkdirSync(editionRoot, {recursive: true});
-        writeEditionLandingPage(editionRoot, edition, modules);
+        writeEditionLandingPage(editionRoot, edition);
 
         for (const moduleIdentifier of edition.modules) {
             fs.cpSync(
@@ -258,21 +252,18 @@ function projectTranslations(editions, modules) {
         for (const edition of editions) {
             const editionRoot = path.join(targetRoot, edition.id);
             fs.mkdirSync(editionRoot, {recursive: true});
-            const localizedModules = new Map();
 
             for (const moduleIdentifier of edition.modules) {
                 const translatedModule = path.join(moduleSourceRoot, moduleIdentifier);
                 const sourceDirectory = fs.existsSync(translatedModule)
                     ? translatedModule
                     : modules.get(moduleIdentifier).sourceDirectory;
-                const landingFileName = findLandingFileName(sourceDirectory);
-                if (landingFileName === undefined) {
-                    throw new Error(`[OBGX] ${sourceDirectory} must have an index.md or index.mdx.`);
+                if (!fs.existsSync(path.join(sourceDirectory, moduleLandingFileName))) {
+                    throw new Error(`[OBGX] ${sourceDirectory} must have a ${moduleLandingFileName}.`);
                 }
-                localizedModules.set(moduleIdentifier, {sourceDirectory, landingFileName});
                 fs.cpSync(sourceDirectory, path.join(editionRoot, moduleIdentifier), {recursive: true});
             }
-            writeEditionLandingPage(editionRoot, edition, localizedModules);
+            writeEditionLandingPage(editionRoot, edition);
         }
     }
 }

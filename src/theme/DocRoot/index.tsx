@@ -55,6 +55,44 @@ function refreshRememberedSidebar(
     };
 }
 
+function withRenderedModuleExpansion(items: PropSidebar): PropSidebar {
+    const normalizedPath = (href: string) => {
+        const pathname = new URL(href, window.location.href).pathname;
+        return pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+    };
+    const sidebarMenus = Array.from(document.querySelectorAll<HTMLElement>(
+        `.${ThemeClassNames.docs.docSidebarMenu}`
+    ));
+    const sidebarMenu = sidebarMenus.find(menu => menu.getClientRects().length > 0) ?? sidebarMenus[0];
+    if (sidebarMenu === undefined) return items;
+
+    const collapsedByHref = new Map<string, boolean>();
+    for (const category of sidebarMenu.querySelectorAll<HTMLElement>(
+        `:scope > .${ThemeClassNames.docs.docSidebarItemCategory}`
+    )) {
+        const link = category.querySelector<HTMLAnchorElement>(
+            ":scope > .menu__list-item-collapsible > a[href]"
+        );
+        const href = link?.getAttribute("href");
+        if (href !== null && href !== undefined) {
+            collapsedByHref.set(
+                normalizedPath(href),
+                category.classList.contains("menu__list-item--collapsed")
+            );
+        }
+    }
+
+    let changed = false;
+    const updatedItems = items.map(item => {
+        if (item.type !== "category" || item.href === undefined) return item;
+        const collapsed = collapsedByHref.get(normalizedPath(item.href));
+        if (collapsed === undefined || collapsed === item.collapsed) return item;
+        changed = true;
+        return {...item, collapsed};
+    });
+    return changed ? updatedItems : items;
+}
+
 function storageKey(locale: string): string {
     return `obgx:last-documentation-sidebar:${locale}`;
 }
@@ -96,11 +134,12 @@ export default function DocRoot(props: Props): ReactNode {
 
     useEffect(() => {
         if (currentSidebar?.sidebarName === undefined || currentSidebar.sidebarItems === undefined) return;
+        const {sidebarName, sidebarItems} = currentSidebar;
 
         if (isGlobalPage) {
             const sidebar = rememberedSidebars.get(currentLocale) ?? loadRememberedSidebar(currentLocale);
             if (sidebar !== undefined) {
-                const refreshedSidebar = refreshRememberedSidebar(currentSidebar.sidebarItems, sidebar);
+                const refreshedSidebar = refreshRememberedSidebar(sidebarItems, sidebar);
                 rememberedSidebars.set(currentLocale, refreshedSidebar);
                 setRememberedSidebar(refreshedSidebar);
                 saveRememberedSidebar(refreshedSidebar);
@@ -108,15 +147,25 @@ export default function DocRoot(props: Props): ReactNode {
             return;
         }
 
-        const sidebar = {
-            locale: currentLocale,
-            name: currentSidebar.sidebarName,
-            items: currentSidebar.sidebarItems
+        const rememberSidebar = (items: PropSidebar) => {
+            const sidebar = {
+                locale: currentLocale,
+                name: sidebarName,
+                items
+            };
+            rememberedSidebars.set(currentLocale, sidebar);
+            setRememberedSidebar(sidebar);
+            saveRememberedSidebar(sidebar);
         };
-        rememberedSidebars.set(currentLocale, sidebar);
-        setRememberedSidebar(sidebar);
-        saveRememberedSidebar(sidebar);
-    }, [currentLocale, currentSidebar?.sidebarItems, currentSidebar?.sidebarName, isGlobalPage]);
+        rememberSidebar(sidebarItems);
+
+        if (pluginId !== "ref") return;
+        const rememberRenderedExpansion = () => {
+            rememberSidebar(withRenderedModuleExpansion(sidebarItems));
+        };
+        document.addEventListener("click", rememberRenderedExpansion, true);
+        return () => document.removeEventListener("click", rememberRenderedExpansion, true);
+    }, [currentLocale, currentSidebar?.sidebarItems, currentSidebar?.sidebarName, isGlobalPage, pluginId]);
 
     if (currentSidebar === null) return <NotFoundContent />;
 

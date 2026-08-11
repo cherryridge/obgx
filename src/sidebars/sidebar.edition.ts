@@ -50,10 +50,10 @@ function readJson<T>(relativePath: string): T {
 
 const editionSidebars = Object.fromEntries(editions.map(edition => edition.id).map(id => [
     `edition-${id}`,
-    createSidebarWith(createEditionItems(id))
+    createSidebarWith(createEditionItems(id), true)
 ]));
 
 export default {
-    sidebar: createSidebarWith(createEditionItems("")),
+    sidebar: createSidebarWith(createEditionItems(""), true),
     ...editionSidebars
 } satisfies SidebarsConfig;

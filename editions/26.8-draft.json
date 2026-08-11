@@ -4,6 +4,7 @@
     "status": "draft",
     "announcement": "announcement/26.8-draft",
     "modules": [
-        "record@1"
+        "record@1",
+        "types@1"
     ]
 }

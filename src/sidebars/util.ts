@@ -19,7 +19,7 @@ function sharedSidebarItem<T extends object>(
 const modulesRoot = path.join(process.cwd(), "modules");
 export const divider = {
     type: "html" as const,
-    value: "<div style='background-color:var(--ifm-color-emphasis-600);height:1px;margin:.5rem'></div>"
+    value: "<div style='background-color:var(--ifm-color-emphasis-500);height:1px;margin:.5rem'></div>"
 };
 
 function collectDocIds(directory: string): string[] {
@@ -47,28 +47,33 @@ export function sortModules(left: string, right: string): number {
 }
 
 export function createModuleCategory(moduleIdentifier: string, idPrefix = "") {
-    const indexId = `${idPrefix}${moduleIdentifier}/index`;
+    const sourceLandingId = `${moduleIdentifier}/_index`;
+    const landingId = `${idPrefix}${sourceLandingId}`;
     const moduleDirectory = path.join(modulesRoot, moduleIdentifier);
 
     return {
         type: "category" as const,
         label: moduleIdentifier,
-        link: {type: "doc" as const, id: indexId},
+        link: {type: "doc" as const, id: landingId},
         items: collectDocIds(moduleDirectory)
+            .filter(id => id !== sourceLandingId)
             .map(id => `${idPrefix}${id}`)
-            .filter(id => id !== indexId)
             .sort()
             .map(id => ({type: "doc" as const, id}))
     };
 }
 
-export function createSidebarWith(dynamicItems: SidebarItems): SidebarItems {
-    const globalItems: SidebarItems = [
-        {type: "link", label: "Overview", href: "/overview"},
-        {type: "link", label: "Terminology", href: "/terminology"},
-        {type: "link", label: "Syntax", href: "/syntax"},
-        {type: "link", label: "Contributing", href: "/contributing"}
-    ];
+export function createSidebarWith(dynamicItems: SidebarItems, resolveGlobalDocs = false): SidebarItems {
+    const globalDocs = [
+        {id: "overview", label: "Overview"},
+        {id: "terminology", label: "Terminology"},
+        {id: "syntax", label: "Syntax"},
+        {id: "contributing", label: "Contributing"}
+    ] as const;
+    const globalItems: SidebarItems = globalDocs.map(({id, label}) => resolveGlobalDocs
+        ? {type: "ref" as const, id, label}
+        : {type: "link" as const, label, href: `/${id}`}
+    );
 
     return [
         ...globalItems.map(item => {
