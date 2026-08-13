@@ -11,11 +11,10 @@ export default function Home() :ReactNode{
     return(<Layout description="Homepage of OBGX documentation.">
         <header className={styles.banner}>
             <Heading as="h1" className="hero__title">{siteConfig.title}</Heading>
-            <div className="hero__subtitle">{translate({id: "homepage.tagline.1", message: "Documentation for the Open Block Game Extension Interface."})}</div>
-            <div className="hero__subtitle">
-                {translate({id: "homepage.tagline.2-1", message: "Select an edition, or start from the "})}
-                <Link href="overview">{translate({id: "homepage.tagline.2-2", message: "overview"})}</Link>
-                {translate({id: "homepage.tagline.2-3", message: "."})}
+            <div className={`${styles.padBottom} hero__subtitle`}>{translate({id: "homepage.tagline.1", message: "Documentation for the Open Block Game Extension Interface."})}</div>
+            <div className={`${styles.buttons} hero__subtitle`}>
+                <Link className="button button--secondary button--lg" to="/overview">Overview</Link>
+                <Link className="button button--secondary button--lg" to="/ref">Reference</Link>
             </div>
         </header>
     </Layout>);
