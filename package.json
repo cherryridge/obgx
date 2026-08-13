@@ -6,6 +6,7 @@
         "docusaurus": "docusaurus",
         "genEditions": "node src/generateEditionViews.mjs",
         "start": "node src/editionHotReload.mjs",
+        "test:redirects": "node --test src/moduleRedirects.test.mjs",
         "build": "npm run genEditions && docusaurus build",
         "swizzle": "docusaurus swizzle",
         "deploy": "docusaurus deploy",
@@ -18,6 +19,7 @@
     "dependencies": {
         "@docusaurus/core": "3.10.2",
         "@docusaurus/faster": "3.10.2",
+        "@docusaurus/plugin-client-redirects": "3.10.2",
         "@docusaurus/plugin-content-docs": "^3.10.2",
         "@docusaurus/preset-classic": "3.10.2",
         "@docusaurus/theme-mermaid": "^3.10.2",
@@ -25,6 +27,7 @@
         "clsx": "^2.0.0",
         "codehike": "^1.1.0",
         "prism-react-renderer": "^2.3.0",
+        "radix-ui": "^1.6.7",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "react-markdown": "^10.1.0",

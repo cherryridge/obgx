@@ -1,0 +1,10 @@
+---
+type: function
+---
+
+This funtion returns true if the record type is fixed-size (i.e. it does not contain any variable-length fields such as strings or vectors, recursively). Otherwise, it returns false.
+
+```obgx
+// !link[/"record"/] hndl_record
+isRecordFixedSize(record: hndl("record")): bool;
+```

@@ -1,0 +1,43 @@
+---
+displayed_sidebar: sidebar
+---
+
+# Best Practices
+
+This page describes best practices for an OBGX implementation for maximizing compability, performance, maintainability, and extensibility. It is not normative and does not define any requirements for an implementation.
+
+## Implementing Types
+
+### Fundamental Types
+
+Most of the programming languages have built-in support for most of the fundamental types defined by OBGX. An implementation should use the host language's built-in types whenever possible.
+
+#### Void
+
+For languages that have a built-in `void` type, it is recommended to use it for OBGX functions that return `void`.
+
+For languages that do not have a built-in `void` type, it is recommended to use the language's built-in null type (`undefined` for JavaScript and `nil` for Lua), if available, or a custom type that represents the absence of a value.
+
+It's worth noting that some languages' built-in null types may be able to convert to or from other OBGX types, which is not allowed by OBGX. In such cases, it is recommended to use a custom type instead, or explicitly warn pack developers about the potential issues.
+
+#### Enums
+
+Enums in OBGX are similar to tagged unions. For C and C++ implementations, it is recommended to use one `enum` and one `union` for representing OBGX enums, since they deliver more performance than `std::variant` or `std::any`. For other languages, it is recommended to use the language's built-in tagged union type, if available.
+
+#### Arrays and Vectors
+
+If one element type is very frequently used in arrays and/or vectors and is fixed-size (e.g. integers, floats), it is recommended to use an arena for contiguous storage of the elements. This will improve performance and reduce memory fragmentation.
+
+It is recommended to implement the ability to get length of an array/vector in the [`introspection`](pathname:///ref/introspection) module.
+
+#### Function Values
+
+Function values are often represented as function pointers or references in many programming languages. However, some languages do not have first-class functions.
+
+In declarative languages, it is recommended to use a function name as a string to represent a function value, when you can ensure it exists in the same pack written in a programming language, in another pack, or in the host. Oftentimes we just choose to not implement those parts of OBGX in a declarative language :)
+
+## Faults
+
+//todo: fault rework
+
+Since OBGX specifies that a fault should mainly redirect the execution flow of the caller pack to another location, it is recommended to implement a fault handler, optimally in the [`fault`](pathname:///ref/fault) module, with the core interface being a function to allow packs to register a custom callback function to handle faults when they occur.

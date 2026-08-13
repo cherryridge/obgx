@@ -17,6 +17,7 @@ function sharedSidebarItem<T extends object>(
 }
 
 const modulesRoot = path.join(process.cwd(), "modules");
+const docIdCollator = new Intl.Collator("en", {caseFirst: "upper"});
 export const divider = {
     type: "html" as const,
     value: "<div style='background-color:var(--ifm-color-emphasis-500);height:1px;margin:.5rem'></div>"
@@ -58,7 +59,7 @@ export function createModuleCategory(moduleIdentifier: string, idPrefix = "") {
         items: collectDocIds(moduleDirectory)
             .filter(id => id !== sourceLandingId)
             .map(id => `${idPrefix}${id}`)
-            .sort()
+            .sort(docIdCollator.compare)
             .map(id => ({type: "doc" as const, id}))
     };
 }
@@ -68,7 +69,10 @@ export function createSidebarWith(dynamicItems: SidebarItems, resolveGlobalDocs 
         {id: "overview", label: "Overview"},
         {id: "terminology", label: "Terminology"},
         {id: "syntax", label: "Syntax"},
-        {id: "contributing", label: "Contributing"}
+        {id: "type", label: "Type System"},
+        {id: "execution", label: "Execution"},
+        {id: "best-practices", label: "Best Practices"},
+        {id: "contributing", label: "Contributing"},
     ] as const;
     const globalItems: SidebarItems = globalDocs.map(({id, label}) => resolveGlobalDocs
         ? {type: "ref" as const, id, label}

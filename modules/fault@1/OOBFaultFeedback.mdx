@@ -1,0 +1,13 @@
+---
+type: enum
+---
+
+This enum is used as the return type of the callback function registered by [`onOOBFault`](onOOBFault). It allows the pack to indicate custom actions to be taken with respect to the specific faulting operation.
+
+```obgx
+enum OOBFaultFeedback {
+    Abort,
+    RespondWithIdx(u64),
+    Ignore
+};
+```

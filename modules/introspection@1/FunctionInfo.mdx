@@ -1,0 +1,17 @@
+---
+type: type
+---
+
+This type is used as the return type of [`getFuncInfo`](getFuncInfo). It contains information about a function.
+
+```obgx
+type FunctionInfo {
+    name: string;
+    // !link[/FunctionOrigin/] FunctionOrigin
+    origin: FunctionOrigin;
+};
+```
+
+## Description
+
+- If the function is anonymous, the `name` field will be an empty string.

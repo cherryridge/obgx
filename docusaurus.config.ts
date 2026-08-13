@@ -4,6 +4,7 @@ import type {Config} from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 import type {CodeHikeConfig} from "codehike/mdx";
 import { remarkCodeHike, recmaCodeHike } from "codehike/mdx";
+import {loadModuleRedirects} from "./src/generateEditionViews.mjs";
 import {remarkCompatableHeading} from "./src/remark/remarkCompatableHeading";
 import {remarkObgxCode} from "./src/remark/remarkObgxCode";
 
@@ -95,6 +96,11 @@ const config :Config = {
     ]],
 
     plugins: [
+        [
+            "@docusaurus/plugin-client-redirects", {
+                redirects: loadModuleRedirects()
+            }
+        ],
         [
             "@docusaurus/plugin-content-docs", {
                 ...codeHikeMdxOptions,

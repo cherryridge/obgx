@@ -1,30 +1,172 @@
 ---
 displayed_sidebar: sidebar
-
 ---
 
 # Syntax
 
-OBGX uses a set of standardized syntax for defining and representing interfaces.
+OBGX uses a standardized, language-independent textual notation to define and represent interfaces.
 
-## General
+:::info
+This notation is used by the OBGX specification. An implementation is not required to parse or execute the notation directly.
+:::
 
-Comments:
+The notation of a type is defined on this page. The abstract meaning of that type is defined by the [Type System](type), and behavior that occurs when an operation is performed is defined by [Execution](execution).
+
+## Lexical Structure
+
+### Whitespace and Comments
+
+Spaces, horizontal tabs, carriage returns, and line feeds are whitespace. Whitespace may separate tokens and is otherwise ignored, except inside string literals and comments.
+
+A line comment starts with `//` and ends before the next line ending or at the end of the document. A block comment starts with `/*` and ends at the next `*/`. Block comments do not nest. Comments are treated as whitespace.
 
 ```obgx
-//Line comment
+// Line comment
 /*
-Multi-line comment
+Block comment
 */
 ```
 
-Declaring an object with a type:
+### Identifiers
+
+Identifiers name types, objects, fields, functions, parameters, and enum members. They are case-sensitive and must match `^[A-Za-z_][A-Za-z0-9_]*$`.
+
+Types and enum members are usually named with PascalCase, while objects, fields, functions, and parameters are usually named with camelCase. These naming conventions are not enforced by OBGX.
+
+[Module identifiers](terminology#module) and [element identifiers](terminology#element) use the separate schemes defined in Terminology.
+
+### Reserved Words
+
+The following words are reserved and MUST NOT be used as user-defined identifiers:
+
+- `type` and `enum` are declaration keywords.
+- `i8`, `i16`, `i32`, `i64`, `u8`, `u16`, `u32`, `u64`, `f32`, `f64`, `bool`, `string`, and `hndl` are fundamental type names.
+- `void` is a special type name that can only appear as the return type of a function type or function declaration.
+- `any` is the type wildcard used in type patterns.
+- `true` and `false` are boolean literals.
+
+### Literals
+
+A string literal is a sequence of Unicode scalar values enclosed in double quotation marks (`"`). A line ending is not permitted inside a string literal. `\"` represents a quotation mark and `\\` represents a backslash; OBGX does not define other string escape sequences.
+
+A positive integer literal is a sequence that matches `^[1-9][0-9]*$`.
+
+The boolean literals are `true` and `false`.
+
+## Type Expressions
+
+A type expression is a named type, a fundamental type, an array or vector type, a function type, an opaque handle type, or the `any` wildcard. A type expression that contains `any` or `*` is a type pattern; any other type expression is a concrete type expression. Parentheses may group a type expression.
+
+### Named and Fundamental Types
+
+A named type is written as its identifier. The fundamental type names are:
 
 ```obgx
-obj: objType;
+i8
+i16
+i32
+i64
+u8
+u16
+u32
+u64
+f32
+f64
+bool
+string
 ```
 
-Declaring a compound type with the `type` keyword:
+### Wildcards and Type Patterns
+
+A type pattern describes one or more admissible concrete types in an OBGX interface. The type wildcard is written as `any`:
+
+```obgx
+any
+```
+
+The constant-value wildcard is written as `*`. It may appear only in a syntactic position that explicitly permits a compile-time constant parameter. In this version of OBGX, only the array-length position permits it. `*` is not an integer literal or a value expression.
+
+Wildcards do not introduce names or bind later occurrences. Each occurrence is independent.
+
+### Array and Vector Types
+
+An array type is written as an element type followed by a positive integer literal in square brackets:
+
+```obgx
+elementType[4]
+```
+
+Signs, digit separators, and expressions are not permitted in an array length.
+
+In an array type pattern, `*` may replace the positive integer literal to match any valid array length:
+
+```obgx
+u32[*]
+any[16]
+any[*]
+```
+
+`any[any]` is invalid because an array length is a compile-time integer parameter, not a type position.
+
+A vector type is written as an element type followed by an empty pair of square brackets:
+
+```obgx
+elementType[]
+```
+
+An empty pair of square brackets always denotes a vector. It does not denote an array with an unspecified length. Therefore, `any[]` is a pattern for any vector, while `any[*]` is a pattern for any array.
+
+Array and vector suffixes bind to the type expression immediately to their left and are applied from left to right. Therefore, the following denotes an array of four vectors of `i32`:
+
+```obgx
+i32[][4]
+```
+
+Parentheses can make grouping explicit when a suffix applies to a function type or another nested type expression. Therefore, the following denotes an array of four functions that take an `i32` and return a `bool`:
+
+```obgx
+((value: i32) => bool)[]
+```
+
+### Function Types
+
+A function type consists of a parenthesized, comma-separated parameter list, `=>`, and a return type. Each parameter has an identifier and a type expression. A return type is either a type expression or `void`:
+
+```obgx
+(param1: type1, param2: type2) => returnType
+```
+
+A zero-parameter function type uses an empty parameter list:
+
+```obgx
+() => void
+```
+
+`void` MUST appear only as the direct return type of a function type or function declaration. It MUST NOT appear in any other type position, and array or vector suffixes MUST NOT be applied to it.
+
+A comma is not permitted after the last parameter.
+
+### Opaque Handle Types
+
+An opaque handle type is written with `hndl` and a string literal that gives its semantic name:
+
+```obgx
+hndl("semanticName")
+```
+
+## Declarations
+
+### Object Declarations
+
+An object declaration consists of an identifier, `:`, a type expression, and a required semicolon:
+
+```obgx
+objectName: ObjectType;
+```
+
+### Compound Type Declarations
+
+A compound type declaration starts with `type`, followed by the type identifier and a brace-delimited sequence of field declarations. Each field declaration and the closing brace must be followed by a semicolon.
 
 ```obgx
 type TypeName {
@@ -33,7 +175,15 @@ type TypeName {
 };
 ```
 
-Declaring an enum with the `enum` keyword:
+An empty compound type is permitted:
+
+```obgx
+type EmptyType {};
+```
+
+### Enum Declarations
+
+An enum declaration starts with `enum`, followed by the type identifier and a non-empty, brace-delimited, comma-separated list of member identifiers. A trailing comma is not permitted. The closing brace must be followed by a semicolon.
 
 ```obgx
 enum EnumName {
@@ -42,179 +192,26 @@ enum EnumName {
 };
 ```
 
-Accessing a field of an object:
+### Function Declarations
+
+A function declaration consists of a function identifier, a parenthesized parameter list, `:`, a return type, and a required semicolon. Parameters use the same form and comma rules as function types.
 
 ```obgx
-obj.field1
+functionName(param1: type1, param2: type2): returnType;
 ```
 
-Declaring a function with a return type:
+A zero-parameter function declaration uses an empty parameter list:
 
 ```obgx
-funcName(param1: type1, param2: type2): returnType;
+functionName(): void;
 ```
 
-Or when used as a type:
+## Field References
+
+An object field may be referenced in specification text by joining the object identifier and field identifier with `.`:
 
 ```obgx
-funcName: (param1: type1, param2: type2) => returnType;
+objectName.fieldName
 ```
 
-## Fundamental Types
-
-OBGX uses the following fundamental types to represent data in a standardized way.
-
-Note that some of the fundamental types don't have a specification in their implementation. This is intended to allow for more flexibility when implementing them in some languages.
-
-### Integer
-
-#### Signed integer
-
-```obgx
-i8
-i16
-i32
-i64
-```
-
-The number after `i` indicates the range of the type. Specifically:
-
-1. `i8` is a signed integer with a range of `-128` to `127`.
-2. `i16` is a signed integer with a range of `-32,768` to `32,767`.
-3. `i32` is a signed integer with a range of `-2,147,483,648` to `2,147,483,647`.
-4. `i64` is a signed integer with a range of `-9,223,372,036,854,775,808` to `9,223,372,036,854,775,807`.
-
-All signed integers wrap to the minimum value when arithmetic operations exceed the maximum value, and vice versa.
-
-OBGX doesn't specify the underlying representation of signed integers, such as bit format, endianness, or memory alignment, although the types are named after their expected bit sizes.
-
-#### Unsigned integer
-
-```obgx
-u8
-u16
-u32
-u64
-```
-
-The number after `u` indicates the range of the type. Specifically:
-
-1. `u8` is an unsigned integer with a range of `0` to `255`.
-2. `u16` is an unsigned integer with a range of `0` to `65,535`.
-3. `u32` is an unsigned integer with a range of `0` to `4,294,967,295`.
-4. `u64` is an unsigned integer with a range of `0` to `18,446,744,073,709,551,615`.
-
-All unsigned integers wrap to zero when arithmetic operations exceed the maximum value, and vice versa.
-
-OBGX also doesn't specify the underlying representation of unsigned integers.
-
-### Float
-
-```obgx
-f32
-f64
-```
-
-Floats follow the IEEE 754 standard for arithmetic operations, including rounding, overflow, underflow, and special values such as `NaN` and `Infinity`.
-
-However, OBGX still doesn't specify the underlying representation of floats. Following the IEEE 754 standard is recommended, but not required.
-
-### Boolean
-
-```obgx
-boolean
-```
-
-Booleans can only have two values: `true` or `false`. The underlying representation is implementation-defined.
-
-### Enum
-
-Declaration:
-
-```obgx
-enum TypeName {
-    Value1,
-    Value2
-};
-```
-
-Usage:
-
-```obgx
-instance: TypeName;
-```
-
-Enums don't have a specific size, and the underlying representation is implementation-defined.
-
-### Container
-
-#### Array
-
-```obgx
-elementType[length]
-```
-
-Arrays should be sequentially indexable by unsigned integers with the first element at index `0` and the last element at index `length - 1`.
-
-Arrays should have a fixed length and should return an error when accessing an index out of bounds.
-
-Host should provide at least one way to get the length of an array when the length is not known at compile time. Using the standardized `types` module is recommended.
-
-Arrays don't require continuous memory allocation, and the underlying representation is implementation-defined.
-
-#### Vector
-
-```obgx
-elementType[]
-```
-
-Vectors are similar to arrays, but they can have a variable length. The length of a vector can be changed at runtime.
-
-Vectors should have a maximum possible length of `u64`.
-
-Host should provide at least one way to get the length of a vector. Using the standardized `types` module is recommended.
-
-Vectors don't require continuous memory allocation, and the underlying representation is implementation-defined.
-
-#### String
-
-```obgx
-string
-```
-
-Strings follow the UTF-8 encoding standard when observed from the outside. The underlying representation is implementation-defined.
-
-### Function Value
-
-Functions can be passed as values in OBGX.
-
-```obgx
-funcName: (param1: type1, param2: type2) => returnType;
-```
-
-Implementations can choose to implement function values as true functions, which often suits programming languages, or as references to functions, which often suits declarative languages.
-
-For example, this implementation choice in JSON is valid:
-
-```json
-"some_interface": {
-    "arg1": 42,
-    "arg2": "hello",
-    "arg3_func_arg": "function_name_refering_to_a_function_somewhere"
-}
-```
-
-### Opaque Handle
-
-Represent any data type that cannot be represented in OBGX, typically because the data type is implementation-defined.
-
-```obgx
-hndl(semanticName)
-```
-
-Handles can have a semantic name, which is represented as a string literal. The semantic name is **only used to clarify the purpose of the handle** and doesn't make the underlying representation of the handle different.
-
-The underlying representation of handles is implementation-defined.
-
-## Fault
-
+This notation identifies a field; it does not define an expression language or runtime field-access behavior.

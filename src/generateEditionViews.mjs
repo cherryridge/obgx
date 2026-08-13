@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
+import {buildModuleRedirects, parseModuleIdentifier} from "./moduleRedirects.mjs";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const globalsRoot = path.join(projectRoot, "globals");
@@ -10,7 +11,6 @@ const generatedRoot = path.join(projectRoot, ".generated", "edition");
 const stagedRoot = path.join(projectRoot, ".generated", "edition.next");
 const generatedDataPath = path.join(projectRoot, ".generated", "editionData.ts");
 const moduleLandingFileName = "_index.mdx";
-const moduleIdentifierPattern = /^[a-z](?:[a-z0-9-]*[a-z0-9])?@[1-9][0-9]*$/;
 const editionIdentifierPattern = /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:\.(0|[1-9][0-9]*))?(-draft)?$/;
 
 function compareModuleIdentifiers(left, right) {
@@ -53,6 +53,15 @@ function readJson(relativePath) {
     return JSON.parse(fs.readFileSync(path.join(projectRoot, relativePath), "utf8"));
 }
 
+function loadModuleIdentifiers() {
+    return fs.readdirSync(modulesRoot, {withFileTypes: true})
+        .filter(entry => entry.isDirectory())
+        .filter(entry => fs.existsSync(path.join(modulesRoot, entry.name, "_category_.json")))
+        .map(entry => entry.name)
+        .map(identifier => parseModuleIdentifier(identifier).identifier)
+        .sort(compareModuleIdentifiers);
+}
+
 function markdownLink(label, href) {
     const escapedLabel = label.replaceAll("\\", "\\\\").replaceAll("[", "\\[").replaceAll("]", "\\]");
     const escapedHref = href.replaceAll(">", "%3E").replaceAll(" ", "%20");
@@ -72,7 +81,7 @@ function createEditionLandingPage(edition) {
     const moduleItems = edition.modules.length === 0
         ? ["_No modules._"]
         : edition.modules.map(moduleIdentifier =>
-            `- [\`${moduleIdentifier}\`](<./${moduleIdentifier}/${moduleLandingFileName}>)`
+            `- [\`${moduleIdentifier}\`](</${edition.id}/${moduleIdentifier}>)`
         );
 
     return [
@@ -117,9 +126,7 @@ function loadEditions() {
             }
 
             for (const moduleIdentifier of manifest.modules) {
-                if (!moduleIdentifierPattern.test(moduleIdentifier)) {
-                    throw new Error(`[OBGX] Invalid Module identifier: ${moduleIdentifier}.`);
-                }
+                parseModuleIdentifier(moduleIdentifier);
                 if (modules.has(moduleIdentifier)) continue;
 
                 const moduleSourceDirectory = path.join(modulesRoot, moduleIdentifier);
@@ -268,8 +275,9 @@ function projectTranslations(editions, modules) {
     }
 }
 
-function writeEditionData(defaultEdition, editions) {
-    const data = {
+function createEditionData(defaultEdition, editions) {
+    const moduleIdentifiers = loadModuleIdentifiers();
+    return {
         defaultEdition,
         editions: editions
             .map(edition => ({
@@ -279,12 +287,12 @@ function writeEditionData(defaultEdition, editions) {
                 modules: edition.modules
             }))
             .sort((left, right) => compareEditionIds(left.id, right.id)),
-        modules: fs.readdirSync(modulesRoot, {withFileTypes: true})
-            .filter(entry => entry.isDirectory())
-            .filter(entry => fs.existsSync(path.join(modulesRoot, entry.name, "_category_.json")))
-            .map(entry => entry.name)
-            .sort(compareModuleIdentifiers)
+        modules: moduleIdentifiers,
+        redirects: buildModuleRedirects(moduleIdentifiers, editions)
     };
+}
+
+function writeEditionData(data) {
     const source = `const editionData = ${JSON.stringify(data, null, 4)} as const;\n\nexport default editionData;`
         .replaceAll("\n", "\r\n");
     fs.mkdirSync(path.dirname(generatedDataPath), {recursive: true});
@@ -293,11 +301,17 @@ function writeEditionData(defaultEdition, editions) {
     }
 }
 
+export function loadModuleRedirects() {
+    const {editions} = loadEditions();
+    return buildModuleRedirects(loadModuleIdentifiers(), editions);
+}
+
 export function generateEditionDocs() {
     const {defaultEdition, editions, modules} = loadEditions();
+    const editionData = createEditionData(defaultEdition, editions);
     projectDefaultDocs(editions, modules);
     projectTranslations(editions, modules);
-    writeEditionData(defaultEdition, editions);
+    writeEditionData(editionData);
     console.log(`Generated ${editions.length} Edition view${editions.length === 1 ? "" : "s"}.`);
 }
 

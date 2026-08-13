@@ -1,0 +1,52 @@
+---
+displayed_sidebar: sidebar
+---
+
+# Execution
+
+## General
+
+This page defines behavior that occurs when OBGX operations are performed. It does not prescribe a host language, runtime, or error-handling mechanism.
+
+The types on which operations act are defined by the [Type System](type).
+
+## Numeric Operations
+
+### Integer Arithmetic
+
+When the result of signed integer arithmetic exceeds the maximum value of its type, it wraps through the minimum value. When it falls below the minimum value, it wraps through the maximum value.
+
+When the result of unsigned integer arithmetic exceeds the maximum value of its type, it wraps through zero. When it falls below zero, it wraps through the maximum value.
+
+### Floating-Point Arithmetic
+
+Floating-point arithmetic must follow the IEEE 754 standard for binary floating-point arithmetic, **when observed from an OBGX interface**. This includes the representation of special values such as `NaN` and infinities, as well as rounding, overflow, and underflow behavior.
+
+:::note
+Remind that the underlying representation of floating-point values is **not specified**. This is to allow some implementations to use string, decimal or other representations.
+:::
+
+## Faults
+
+//todo: fault rework
+
+A fault occurs when a required execution precondition of an OBGX operation is violated. A fault is not an ordinary recoverable failure and is not part of the operation's normal return type.
+
+When a fault triggers, the implementation must:
+
+- NOT return to the caller of the operation;
+- NOT terminate itself or the host process;
+- NOT terminate or corrupt packs that did not participate in the faulting operation.
+- Redirect the execution flow of the caller pack to another location, often a fault handler.
+
+OBGX does not specify how a language binding implements a fault. A binding may map it to a trap, exception, virtual-machine error, host-side error propagation, or another mechanism appropriate to that binding. This does not define a uniform OBGX exception system.
+
+Recoverable failures that are part of an interface's normal operation may continue to be represented by success or result data defined by that interface.
+
+A complete list of specified possible causes of fault is listed below. A binding may define additional causes of faults.
+
+### 1. Out-of-Bounds Access
+
+Access to an array or vector with an index outside that container's valid index domain produces an out-of-bounds fault.
+
+An out-of-bounds access produces neither a default value nor an undefined value. The index MUST NOT be wrapped or clamped, and the fault does not require the element type to have a default value. It MUST NOT be represented as an ordinary recoverable-failure return value.

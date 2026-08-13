@@ -1,0 +1,6 @@
+{
+    "label": "introspection@1",
+    "customProps": {
+        "domain": "runtime"
+    }
+}

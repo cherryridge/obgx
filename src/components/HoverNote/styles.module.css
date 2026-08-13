@@ -1,0 +1,21 @@
+.trigger {
+    border-bottom: 1px dotted var(--ifm-color-emphasis-600);
+    cursor: help;
+}
+
+.content {
+    max-width: 320px;
+    padding: 0.5rem 0.7rem;
+
+    border: 1px solid var(--ifm-color-emphasis-300);
+    border-radius: 6px;
+
+    background: var(--ifm-background-surface-color);
+    color: var(--ifm-font-color-base);
+
+    box-shadow: var(--ifm-global-shadow-lw);
+    font-size: 0.875rem;
+    line-height: 1.4;
+
+    z-index: 100;
+}

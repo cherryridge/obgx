@@ -1,0 +1,20 @@
+---
+type: enum
+---
+
+This enum describes the origin of a function.
+
+The origin of a function value can either be:
+
+1. The host.
+2. The caller pack.
+3. Packs other than the caller pack. In this case, the origin is represented by a handle to the pack that the function belongs to.
+
+```obgx
+enum FunctionOrigin {
+    Host,
+    Caller,
+    // !link[/"pack"/] ../basic-handles@1/hndl_pack
+    Other(hndl("pack"))
+};
+```

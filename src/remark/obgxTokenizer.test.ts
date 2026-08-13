@@ -24,7 +24,7 @@ async function asyncTest(name: string, callback: () => Promise<void>) {
 test("classifies OBGX declarations using their syntax context", () => {
     const source = [
         "type RegisterRecordResult {",
-        "    success: boolean;",
+        "    success: bool;",
         "    message: string;",
         "};",
         "registerRecord(record: RecordDesc): RegisterRecordResult;",
@@ -34,7 +34,7 @@ test("classifies OBGX declarations using their syntax context", () => {
     assert.deepEqual(kindsFor(source, "type"), ["keyword"]);
     assert.deepEqual(kindsFor(source, "RegisterRecordResult"), ["type", "type"]);
     assert.deepEqual(kindsFor(source, "success"), ["property", "property"]);
-    assert.deepEqual(kindsFor(source, "boolean"), ["builtinType"]);
+    assert.deepEqual(kindsFor(source, "bool"), ["builtinType"]);
     assert.deepEqual(kindsFor(source, "string"), ["builtinType"]);
     assert.deepEqual(kindsFor(source, "registerRecord"), ["function"]);
     assert.deepEqual(kindsFor(source, "record"), ["parameter", "variable"]);
@@ -45,18 +45,20 @@ test("classifies fundamental, array, handle, and enum types", () => {
     const source = [
         "i8[4]",
         "CustomType[]",
-        "hndl(semanticName)",
+        "hndl(\"semanticName\")",
         "oldArray: array;",
         "oldVector: vector;",
         "enum TypeName {",
         "    Value1,",
-        "    Value2",
-        "};"
+        "    Value2(u64),",
+        "    Array(FieldType)",
+        "};",
+        "functionName()"
     ].join("\n");
 
     assert.deepEqual(kindsFor(source, "i8"), ["builtinType"]);
     assert.deepEqual(kindsFor(source, "hndl"), ["builtinType"]);
-    assert.deepEqual(kindsFor(source, "semanticName"), ["handleName"]);
+    assert.deepEqual(kindsFor(source, "\"semanticName\""), ["string"]);
     assert.deepEqual(kindsFor(source, "CustomType"), ["type"]);
     assert.deepEqual(kindsFor(source, "array"), ["type"]);
     assert.deepEqual(kindsFor(source, "vector"), ["type"]);
@@ -65,11 +67,15 @@ test("classifies fundamental, array, handle, and enum types", () => {
     assert.deepEqual(kindsFor(source, "TypeName"), ["type"]);
     assert.deepEqual(kindsFor(source, "Value1"), ["enumMember"]);
     assert.deepEqual(kindsFor(source, "Value2"), ["enumMember"]);
-    const colors = toCodeHikeTokens(parseObgx("type TypeName {}; value: boolean; custom: TypeName[]; handle: hndl(record); old: array;"));
+    assert.deepEqual(kindsFor(source, "Array"), ["enumMember"]);
+    assert.deepEqual(kindsFor(source, "FieldType"), ["type"]);
+    assert.deepEqual(kindsFor(source, "u64"), ["builtinType"]);
+    assert.deepEqual(kindsFor(source, "functionName"), ["function"]);
+    const colors = toCodeHikeTokens(parseObgx("type TypeName {}; value: bool; custom: TypeName[]; handle: hndl(\"record\"); old: array;"));
     assert.equal(colors.some(token => Array.isArray(token) && token[0] === "type" && token[1] === "var(--obgx-keyword-color)"), true);
-    assert.equal(colors.some(token => Array.isArray(token) && token[0] === "boolean" && token[1] === "var(--obgx-builtin-type-color)"), true);
+    assert.equal(colors.some(token => Array.isArray(token) && token[0] === "bool" && token[1] === "var(--obgx-builtin-type-color)"), true);
     assert.equal(colors.some(token => Array.isArray(token) && token[0] === "TypeName" && token[1] === "var(--obgx-type-color)"), true);
-    assert.equal(colors.some(token => Array.isArray(token) && token[0] === "record" && token[1] === "var(--obgx-handle-name-color, var(--ch-8))"), true);
+    assert.equal(colors.some(token => Array.isArray(token) && token[0] === "\"record\"" && token[1] === "var(--obgx-string-literal-color)"), true);
     assert.equal(colors.some(token => Array.isArray(token) && token[0] === "array" && token[1] === "var(--obgx-type-color)"), true);
 });
 
@@ -81,6 +87,62 @@ test("classifies function values and their array return types", () => {
     assert.deepEqual(kindsFor(source, "InputType"), ["type"]);
     assert.deepEqual(kindsFor(source, "i8"), ["builtinType"]);
     assert.deepEqual(kindsFor(source, "OutputType"), ["type"]);
+});
+
+test("classifies type and constant-value wildcards", () => {
+    const source = [
+        "acceptAny(value: any): void;",
+        "getLengthOfArray(arr: any[*]): u64;",
+        "acceptFixedArray(arr: any[16]): void;",
+        "acceptU32Array(arr: u32[*]): void;",
+        "getVecLen(vec: any[]): u64;"
+    ].join("\n");
+    const colors = toCodeHikeTokens(parseObgx(source));
+
+    assert.deepEqual(kindsFor(source, "any"), ["builtinType", "builtinType", "builtinType", "builtinType"]);
+    assert.deepEqual(kindsFor(source, "*"), ["punctuation", "punctuation"]);
+    assert.equal(colors.filter(token => Array.isArray(token) && token[0] === "any" && token[1] === "var(--obgx-builtin-type-color)").length, 4);
+    assert.equal(colors.filter(token => Array.isArray(token) && token[0] === "*" && token[1] === "var(--ch-4)").length, 2);
+});
+
+test("classifies void function return types", () => {
+    const source = "callback: () => void;\nnotify(): void;";
+    const colors = toCodeHikeTokens(parseObgx(source));
+
+    assert.deepEqual(kindsFor(source, "void"), ["builtinType", "builtinType"]);
+    assert.equal(colors.filter(token => Array.isArray(token) && token[0] === "void" && token[1] === "var(--obgx-builtin-type-color)").length, 2);
+});
+
+test("classifies standalone and parenthesized function types", () => {
+    const functionType = "(param1: type1, param2: type2) => returnType";
+    const zeroParameterType = "() => zeroReturnType";
+    const parenthesizedType = "((value: i32) => bool)[]";
+
+    assert.deepEqual(kindsFor(functionType, "param1"), ["parameter"]);
+    assert.deepEqual(kindsFor(functionType, "param2"), ["parameter"]);
+    assert.deepEqual(kindsFor(functionType, "type1"), ["type"]);
+    assert.deepEqual(kindsFor(functionType, "type2"), ["type"]);
+    assert.deepEqual(kindsFor(functionType, "returnType"), ["type"]);
+    assert.deepEqual(kindsFor(zeroParameterType, "zeroReturnType"), ["type"]);
+    assert.deepEqual(kindsFor(parenthesizedType, "value"), ["parameter"]);
+    assert.deepEqual(kindsFor(parenthesizedType, "i32"), ["builtinType"]);
+    assert.deepEqual(kindsFor(parenthesizedType, "bool"), ["builtinType"]);
+});
+
+test("uses the property color for object and field identifiers", () => {
+    const source = "objectName: ObjectType;\nobjectName.fieldName";
+    const colors = toCodeHikeTokens(parseObgx(source));
+
+    assert.deepEqual(kindsFor(source, "objectName"), ["variable", "variable"]);
+    assert.deepEqual(kindsFor(source, "fieldName"), ["property"]);
+    assert.deepEqual(
+        colors.filter(token => Array.isArray(token) && ["objectName", "fieldName"].includes(token[0])),
+        [
+            ["objectName", "var(--obgx-property-color)"],
+            ["objectName", "var(--obgx-property-color)"],
+            ["fieldName", "var(--obgx-property-color)"]
+        ]
+    );
 });
 
 test("preserves whitespace, comments, and incomplete input exactly", () => {

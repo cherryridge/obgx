@@ -4,7 +4,9 @@
     "status": "draft",
     "announcement": "announcement/26.8-draft",
     "modules": [
-        "record@1",
-        "types@1"
+        "introspection@1",
+        "basic-handles@1",
+        "fault@1",
+        "record@1"
     ]
 }

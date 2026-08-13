@@ -1,0 +1,25 @@
+---
+type: enum
+---
+
+This enum is used to represent the fundamental types of OBGX.
+
+:::info
+This enum is NOT used to represent the type of a field in a record. For that, see [`FieldType`](pathname:///ref/record/FieldType).
+:::
+
+```obgx
+enum FundamentalType {
+    I8, I16, I32, I64,
+    U8, U16, U32, U64,
+    F32, F64,
+    Bool,
+    String,
+    Void,
+    Enum,
+    Array,
+    Vector,
+    Function,
+    Handle
+}
+```

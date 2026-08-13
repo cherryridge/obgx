@@ -1,0 +1,125 @@
+---
+displayed_sidebar: sidebar
+---
+
+# Type System
+
+## General
+
+The OBGX type system defines the abstract types and values used by OBGX interfaces. It is independent of any host language or storage format. **Unless explicitly stated otherwise, the underlying representation of a value is implementation-defined**.
+
+The standardized textual forms for these types are defined by [Syntax](syntax). Behavior produced by operations on values is defined by [Execution](execution).
+
+## Type Patterns
+
+A type pattern describes a set of admissible concrete OBGX types. When an interface declaration uses a type pattern, a value is admissible when its concrete type matches that pattern. A type pattern does not erase or change the value's concrete type, and it does not require dynamic typing or a particular runtime representation.
+
+`any` is the type wildcard. It matches every concrete OBGX value type that is valid in its position. It is not itself a concrete type, and no OBGX value has `any` as its concrete type. Because `void` is a function return type rather than a value type, `any` does not match `void`.
+
+`*` is the constant-value wildcard. In a compile-time constant parameter position, it matches every concrete value valid for that parameter. It preserves the parameter's kind and domain: in an array-length position, for example, it matches any positive integer length. It is not a type wildcard, an integer value, or a runtime value.
+
+A type constructor containing wildcards matches a concrete type formed with the same constructor when each concrete component matches the corresponding pattern component. In particular:
+
+- `u32[*]` matches every fixed-length array whose element type is `u32`.
+- `any[16]` matches every array whose fixed length is `16`.
+- `any[*]` matches every array; equivalently, it denotes arrays `T[N]` for any concrete element type `T` and any valid positive length `N`.
+- `any[]` matches every vector. It does not match an array.
+
+Each wildcard occurrence is independent. Wildcards do not express that two matched types or values must be equal; such a relationship requires a separately defined named parameter mechanism.
+
+## Fundamental Types
+
+### Integer
+
+#### Signed Integer
+
+OBGX provides four signed integer types with the following value ranges:
+
+1. `i8`: `-128` through `127`.
+2. `i16`: `-32,768` through `32,767`.
+3. `i32`: `-2,147,483,648` through `2,147,483,647`.
+4. `i64`: `-9,223,372,036,854,775,808` through `9,223,372,036,854,775,807`.
+
+:::tip
+"Implementation-defined" representation means: Such as bit format, endianness, or memory alignment of signed integers are not specified by OBGX.
+
+An implementation may choose to represent signed integers in two's complement, sign-magnitude, or another representation. The implementation may also choose to represent signed integers in little-endian or big-endian. The implementation may choose to align signed integers on any byte boundary.
+
+The type names indicate their *expected conventional storage bit sizes* but do not impose those representation details.
+:::
+
+
+#### Unsigned Integer
+
+OBGX provides four unsigned integer types with the following value ranges:
+
+1. `u8`: `0` through `255`.
+2. `u16`: `0` through `65,535`.
+3. `u32`: `0` through `4,294,967,295`.
+4. `u64`: `0` through `18,446,744,073,709,551,615`.
+
+### Float
+
+`f32` and `f64` are floating-point types. Their exact finite value domains and whether they include special values such as `NaN` and infinities remain unspecified pending the floating-point decision described in [Floating-Point Arithmetic](execution#floating-point-arithmetic).
+
+### Boolean
+
+Values of type `bool` have exactly two possible values: `true` and `false`.
+
+### String
+
+**When observed through an OBGX interface**, a `string` should behave as a sequence of UTF-8 code points.
+
+### Void
+
+`void` is a built-in function return type. Any value returned by a function whose return type is `void` has no meaning in the OBGX specification. `void` cannot be converted to or from any other OBGX type. OBGX does not specify whether such a function must return a value or, if it does, what kind of value it returns.
+
+### Enum
+
+Each enum declaration defines a union of named members. The active member of an enum value can be any of its members but only one of its members at a time.
+
+Each member must have a unique underlying representation.
+
+Each member can optionally have an additional payload of a specific type. It should be accessible only when the value is that member.
+
+A host must provide at least one way to determine whether an enum value's active member is any of the member of the enum type. For every member that has a payload, the host must also provide at least one way to obtain that payload when the value is that member. OBGX does not prescribe the API or language construct used for either operation.
+
+### Containers
+
+Reminder: OBGX does not require a container to have a contiguous storage space.
+
+#### Array
+
+An array is an ordered, indexed collection of values of one element type. Every array has a fixed, positive length. Its valid indices are the unsigned integer values from `0` through `length - 1`.
+
+#### Vector
+
+A vector is an ordered, indexed collection of values of one element type whose length is not determined at compile time and may vary during runtime. Every vector has a non-negative length in the `u64` value range. Its valid indices are the unsigned integer values from `0` through `length - 1`; an empty vector has no valid indices.
+
+### Function Value
+
+A function value is an object that can be invoked with a specific set of argument types and has a specific return type.
+
+A function can be passed as an OBGX value. An implementation may represent a function value as a native function, a reference to a function, or any other implementation-defined representation.
+
+For example, the following is a non-normative example of a declarative implementation representing a function value by name:
+
+```json
+{
+    "some_interface_function": {
+        "arg1": 42,
+        "arg2": "string_example",
+        "arg3": "function_name_referring_to_a_function_somewhere"
+    }
+}
+```
+
+### Opaque Handle
+
+An opaque handle represents data that cannot otherwise be represented as an OBGX value, typically because the data's specification is implementation-defined.
+
+A handle's semantic name describes the purpose or kind of data referenced by the handle. The semantic name does not change the handle's underlying representation.
+
+## Recursions in Definitions of Types
+
+Recursive occurrences in an OBGX type describe semantic containment only. Implementations MAY introduce transparent indirection, references, indices, interning, or other representations to implement recursive values. Such representation details MUST NOT alter the observable OBGX semantics.

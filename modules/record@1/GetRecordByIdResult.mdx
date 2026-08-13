@@ -1,0 +1,14 @@
+---
+type: enum
+---
+
+This enum is used for the return type of [`getRecordById`](getRecordById).
+
+```obgx
+enum GetRecordByIdResult {
+    // !link[/"record"/] hndl_record
+    Success(hndl("record")),
+    NotFound,
+    InvalidId
+};
+```

@@ -40,7 +40,8 @@
     --obgx-type-color: #673905;
     --obgx-builtin-type-color: #4c7e96;
     --obgx-property-color: #2856a1;
-    --obgx-handle-name-color: #af765a;
+    --obgx-string-literal-color: #a65f3b;
+    --obgx-enum-member-color: #0d1089;
 }
 
 html[data-theme="dark"]{
@@ -85,7 +86,8 @@ html[data-theme="dark"]{
     --obgx-type-color: #7dc5b0;
     --obgx-builtin-type-color: #74dc7d;
     --obgx-property-color: #b0daf9;
-    --obgx-handle-name-color: #c0937c;
+    --obgx-string-literal-color: #c0937c;
+    --obgx-enum-member-color: #8092eb;
 }
 
 html[data-theme="dark"] :where(.button--secondary){
@@ -158,6 +160,6 @@ h5{
     line-height: 1.55;
 }
 
-.pagination-nav{
-    display: none;
+.theme-doc-markdown{
+    padding-bottom: 10dvh;
 }

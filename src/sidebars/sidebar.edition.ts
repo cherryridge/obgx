@@ -9,6 +9,7 @@ const domains = [
     { identifier: "presentation", label: "Presentation" },
     { identifier: "interaction", label: "Interaction" },
     { identifier: "host-services", label: "Host Services" },
+    { identifier: "runtime", label: "Runtime" },
     { identifier: "host-integration", label: "Host Integration" },
     { identifier: "diagnostics", label: "Diagnostics" }
 ] as const;

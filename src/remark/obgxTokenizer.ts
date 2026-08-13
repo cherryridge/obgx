@@ -13,7 +13,6 @@ export type ObgxTokenKind =
     | "variable"
     | "number"
     | "literal"
-    | "handleName"
     | "string"
     | "punctuation"
     | "plain";
@@ -38,7 +37,8 @@ type Range = {
 
 const KEYWORDS = new Set(["enum", "type"]);
 const BUILTIN_TYPES = new Set([
-    "boolean",
+    "any",
+    "bool",
     "f32",
     "f64",
     "hndl",
@@ -50,7 +50,8 @@ const BUILTIN_TYPES = new Set([
     "u8",
     "u16",
     "u32",
-    "u64"
+    "u64",
+    "void"
 ]);
 const LITERALS = new Set(["false", "Infinity", "NaN", "true"]);
 
@@ -62,12 +63,11 @@ const COLORS: Record<Exclude<ObgxTokenKind, "whitespace">, string> = {
     function: "var(--ch-5)",
     parameter: "var(--obgx-property-color)",
     property: "var(--obgx-property-color)",
-    enumMember: "var(--ch-2)",
-    variable: "var(--ch-4)",
+    enumMember: "var(--obgx-enum-member-color)",
+    variable: "var(--obgx-property-color)",
     number: "var(--ch-2)",
     literal: "var(--ch-2)",
-    handleName: "var(--obgx-handle-name-color)",
-    string: "var(--ch-8)",
+    string: "var(--obgx-string-literal-color)",
     punctuation: "var(--ch-4)",
     plain: "var(--ch-4)"
 };
@@ -251,15 +251,21 @@ function classify(lexemes: Lexeme[]) {
     }
 
     for (let index = 0; index < lexemes.length; index++) {
+        if (lexemes[index].value !== "(") continue;
+        const closeIndex = findMatching(lexemes, index, "(", ")");
+        const arrowIndex = nextCodeIndex(lexemes, closeIndex);
+        if (arrowIndex === undefined || lexemes[arrowIndex].value !== "=>") continue;
+
+        parameterLists.push({from: index, to: closeIndex});
+        markTypeExpression(lexemes, nextCodeIndex(lexemes, arrowIndex), new Set([";", "}"]));
+    }
+
+    for (let index = 0; index < lexemes.length; index++) {
         const token = lexemes[index];
         if (token.lexicalKind !== "identifier") continue;
+        if (isInside(index, enumBodies)) continue;
         const nextIndex = nextCodeIndex(lexemes, index);
         if (token.value === "hndl" && nextIndex !== undefined && lexemes[nextIndex].value === "(") {
-            const closeIndex = findMatching(lexemes, nextIndex, "(", ")");
-            const nameIndex = nextCodeIndex(lexemes, nextIndex);
-            if (nameIndex !== undefined && nameIndex < closeIndex && lexemes[nameIndex].lexicalKind === "identifier") {
-                lexemes[nameIndex].kind = "handleName";
-            }
             continue;
         }
         const colonIndex = nextIndex !== undefined && lexemes[nextIndex].value === ":" ? nextIndex : undefined;
@@ -276,9 +282,19 @@ function classify(lexemes: Lexeme[]) {
     }
 
     for (const range of enumBodies) {
-        for (let index = range.from + 1; index < range.to; index++) {
+        let index = nextCodeIndex(lexemes, range.from);
+        while (index !== undefined && index < range.to) {
             const token = lexemes[index];
             if (token.lexicalKind === "identifier" && token.kind === "plain") token.kind = "enumMember";
+
+            const payloadOpenIndex = nextCodeIndex(lexemes, index);
+            if (token.lexicalKind === "identifier" && payloadOpenIndex !== undefined && lexemes[payloadOpenIndex].value === "(") {
+                const payloadCloseIndex = findMatching(lexemes, payloadOpenIndex, "(", ")");
+                markTypeExpression(lexemes, nextCodeIndex(lexemes, payloadOpenIndex), new Set([")"]));
+                index = nextCodeIndex(lexemes, payloadCloseIndex);
+            } else {
+                index = nextCodeIndex(lexemes, index);
+            }
         }
     }
 

@@ -1,0 +1,6 @@
+{
+    "label": "fault@1",
+    "customProps": {
+        "domain": "runtime"
+    }
+}
