@@ -26,7 +26,7 @@ export interface CompatibilitySubfeature {
     readonly support: SupportMap;
 }
 
-export interface CompatableProps {
+export interface CompatTableProps {
     readonly element: string;
     readonly support: SupportMap;
     readonly subfeatures?: readonly CompatibilitySubfeature[];
@@ -118,7 +118,7 @@ function SupportCell({
     );
 }
 
-export default function Compatable({element, support, subfeatures = []}: CompatableProps) {
+export default function CompatTable({element, support, subfeatures = []}: CompatTableProps) {
     const noteIdPrefix = useId().replaceAll(":", "");
     const rows: readonly CompatibilityRow[] = [
         {

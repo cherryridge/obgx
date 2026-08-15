@@ -5,7 +5,7 @@ import type * as Preset from "@docusaurus/preset-classic";
 import type {CodeHikeConfig} from "codehike/mdx";
 import { remarkCodeHike, recmaCodeHike } from "codehike/mdx";
 import {loadModuleRedirects} from "./src/generateEditionViews.mjs";
-import {remarkCompatableHeading} from "./src/remark/remarkCompatableHeading";
+import {remarkCompatTableHeading} from "./src/remark/remarkCompatTableHeading";
 import {remarkObgxCode} from "./src/remark/remarkObgxCode";
 
 type MarkdownNode = {
@@ -36,7 +36,7 @@ const codeHikeMdxOptions: Pick<
     MDXOptions,
     "beforeDefaultRemarkPlugins" | "remarkPlugins" | "recmaPlugins"
 > = {
-    beforeDefaultRemarkPlugins: [remarkCompatableHeading],
+    beforeDefaultRemarkPlugins: [remarkCompatTableHeading],
     remarkPlugins: [
         remarkDefaultCodeLanguage,
         [remarkObgxCode, {component: "CodeHikeCode", theme: codeHikeTheme}],
@@ -166,7 +166,7 @@ const config :Config = {
                         },
                         {
                             label: "Help Us Translate!",
-                            to: "contributing#translate"
+                            to: "contributing#translate-documentation"
                         }
                     ]
                 }

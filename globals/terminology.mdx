@@ -41,9 +41,9 @@ Current domains include:
 
 Refers to an independent unit of functionality within a domain, which can probably be implemented as a unit.
 
-Module is the core concept of OBGX, so important that they have their identifiers, and is the unit of versioning and dependency management.
+Module is the core concept of OBGX. They are the unit of versioning and dependency management.
 
-The scheme for module identifiers is `[<vendor>/]<moduleName>@<version>`, in which `<vendor>` and `<moduleName>` matches `^[a-z](?:[a-z0-9-]*[a-z0-9])?$`, and `<version>` matches `^[1-9][0-9]*$`.
+Every module has an identifier. The scheme for module identifiers is `[<vendor>/]<moduleName>@<version>`, in which `<vendor>` and `<moduleName>` match `^[a-z](?:[a-z0-9-]*[a-z0-9])?$`, and `<version>` matches `^[1-9][0-9]*$`.
 
 For example, `block@1` and `cherrygrove/block-layers@200` are valid module identifiers.
 
@@ -69,7 +69,13 @@ For example, `block@>=4<8` means the module `block` with version greater than or
 
 Refers to an atomic unit of normative construct inside a module, which can be a data structure, a function, or a class.
 
-An element must belong to one version of a module. The scheme for element identifiers is `<module-scheme>/<elementName>`, in which `<elementName>` matches `^[a-z_][a-z0-9_]*$`.
+An element must belong to one version of a module. The scheme for element identifiers is `<module-scheme>/<elementName>`, in which `<elementName>` matches `^[a-zA-Z_][a-zA-Z0-9_]*$`.
+
+For example, `block@1/Block` and `cherrygrove/block-layers@2/regBlockLayer` are valid element identifiers.
+
+## Game Object
+
+Refers to a piece of game content metadata registered with a host through an OBGX interface, such as a record, block, or entity.
 
 ## Host
 
@@ -78,3 +84,15 @@ An element must belong to one version of a module. The scheme for element identi
 ## Pack
 
 (Or **content pack**) refers to a collection of interface usage code and static assets that can interact with any host that correctly implements any module of the OBGX standard.
+
+## Identifier
+
+When this terminology occurs without context, it refers to a value used to identify a [game object](#game-object).
+
+This word also occurs with context. When it occurs with context, it refers to a value used to identify another thing depending on the context.
+
+## Namespace
+
+Refers to an identifier associated by the host with a pack that participates in OBGX operations. Each pack is associated with exactly one namespace, while multiple packs may be associated with the same namespace.
+
+A namespace does not identify a pack or imply ownership by a pack. OBGX does not specify how a host determines, stores, or internally represents the namespace associated with a pack.

@@ -24,22 +24,22 @@ function createCompatibilityHeading(): MarkdownNode {
     };
 }
 
-function insertCompatableHeadings(parent: MarkdownNode): void {
+function insertCompatTableHeadings(parent: MarkdownNode): void {
     const {children} = parent;
     if (children === undefined) return;
 
     for (let index = 0; index < children.length; index++) {
         const child = children[index];
         if (child?.type === "mdxJsxFlowElement"
-            && child.name === "Compatable"
+            && child.name === "CompatTable"
             && !isCompatibilityHeading(children[index - 1])) {
             children.splice(index, 0, createCompatibilityHeading());
             index++;
         }
-        if (child !== undefined) insertCompatableHeadings(child);
+        if (child !== undefined) insertCompatTableHeadings(child);
     }
 }
 
-export function remarkCompatableHeading() {
-    return (root: MarkdownNode) => insertCompatableHeadings(root);
+export function remarkCompatTableHeading() {
+    return (root: MarkdownNode) => insertCompatTableHeadings(root);
 }

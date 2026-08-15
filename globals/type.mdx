@@ -60,7 +60,9 @@ OBGX provides four unsigned integer types with the following value ranges:
 
 ### Float
 
-`f32` and `f64` are floating-point types. Their exact finite value domains and whether they include special values such as `NaN` and infinities remain unspecified pending the floating-point decision described in [Floating-Point Arithmetic](execution#floating-point-arithmetic).
+`f32` and `f64` are floating-point types.
+
+The underlying representation of floating-point values is **not specified**. This is to allow some implementations to use string, decimal or other representations.
 
 ### Boolean
 
@@ -68,7 +70,27 @@ Values of type `bool` have exactly two possible values: `true` and `false`.
 
 ### String
 
-**When observed through an OBGX interface**, a `string` should behave as a sequence of UTF-8 code points.
+**When observed through an OBGX interface**, a `string` should behave as a sequence of Unicode scalar values encoded as UTF-8.
+
+### Identifier
+
+#### ID
+
+`id` is a built-in type whose values are atomic identifiers. The interface that uses an `id` defines the scope in which it identifies a value. A namespace can be represented by an `id`, and the identifier of a game object registered within a namespace can also be represented by an `id`. The `id` of a game object does not include a namespace.
+
+The representation of an `id` is implementation-defined. OBGX does not prescribe how an `id` is constructed, stored, or serialized.
+
+#### Reference ID
+
+`refid` is a built-in type used to refer to a game object. A `refid` always contains the game object's identifier as `id` and a namespace as `id`. `refid` may NOT refer to a valid or registered game object.
+
+The host must provide at least one way to construct a `refid` from a game object identifier, and at least one way to construct a `refid` from an identifier and a namespace identifier.
+
+When constructing a `refid` with a game object identifier (the first case in the previous paragraph), the host must use the namespace associated with the caller pack to construct the `refid`.
+
+OBGX does not prescribe the API or language construct used to construct `refid`.
+
+The representation of a `refid` is implementation-defined. OBGX does not require its identifier and namespace identifier to be stored or passed any particular format, and does not prescribe a textual separator or serialized form.
 
 ### Void
 
@@ -82,7 +104,9 @@ Each member must have a unique underlying representation.
 
 Each member can optionally have an additional payload of a specific type. It should be accessible only when the value is that member.
 
-A host must provide at least one way to determine whether an enum value's active member is any of the member of the enum type. For every member that has a payload, the host must also provide at least one way to obtain that payload when the value is that member. OBGX does not prescribe the API or language construct used for either operation.
+The host must provide at least one way to determine an enum value's active member.
+
+For every member that has a payload, the host must also provide at least one way to obtain that payload when the value is that member. OBGX does not prescribe the API or language construct used for either operation.
 
 ### Containers
 
@@ -90,11 +114,15 @@ Reminder: OBGX does not require a container to have a contiguous storage space.
 
 #### Array
 
-An array is an ordered, indexed collection of values of one element type. Every array has a fixed, positive length. Its valid indices are the unsigned integer values from `0` through `length - 1`.
+An array is an ordered, indexed collection of values of one element type. Every array has a fixed, positive length in the `u64` value range. Its valid indices are the unsigned integer values from `0` through `length - 1`.
+
+The host must provide at least one way to determine an array's length. OBGX does not prescribe the API or language construct used to obtain an array's length.
 
 #### Vector
 
 A vector is an ordered, indexed collection of values of one element type whose length is not determined at compile time and may vary during runtime. Every vector has a non-negative length in the `u64` value range. Its valid indices are the unsigned integer values from `0` through `length - 1`; an empty vector has no valid indices.
+
+The host must provide at least one way to determine a vector's length. OBGX does not prescribe the API or language construct used to obtain a vector's length.
 
 ### Function Value
 

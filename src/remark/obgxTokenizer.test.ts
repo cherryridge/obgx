@@ -79,6 +79,23 @@ test("classifies fundamental, array, handle, and enum types", () => {
     assert.equal(colors.some(token => Array.isArray(token) && token[0] === "array" && token[1] === "var(--obgx-type-color)"), true);
 });
 
+test("classifies identifier types and subject-specific identifiers", () => {
+    const source = [
+        "type RecordDesc {",
+        "    recordId: id;",
+        "    fieldId: id;",
+        "};",
+        "getRecord(recordId: refid): hndl(\"record\");"
+    ].join("\n");
+    const colors = toCodeHikeTokens(parseObgx(source));
+
+    assert.deepEqual(kindsFor(source, "id"), ["builtinType", "builtinType"]);
+    assert.deepEqual(kindsFor(source, "refid"), ["builtinType"]);
+    assert.deepEqual(kindsFor(source, "recordId"), ["property", "parameter"]);
+    assert.deepEqual(kindsFor(source, "fieldId"), ["property"]);
+    assert.equal(colors.filter(token => Array.isArray(token) && ["id", "refid"].includes(token[0]) && token[1] === "var(--obgx-builtin-type-color)").length, 3);
+});
+
 test("classifies function values and their array return types", () => {
     const source = "callback: (value: InputType[], fixed: i8[4]) => OutputType[];";
 

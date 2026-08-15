@@ -2,9 +2,9 @@
 type: function
 ---
 
-This function returns the handle of an existing record type, given its name and the namespace of the caller pack.
+This function returns the handle of an existing record type identified by the given reference ID.
 
 ```obgx
 // !link[/GetRecordResult/] GetRecordResult
-getRecord(name: string): GetRecordResult;
+getRecord(recordId: refid): GetRecordResult
 ```

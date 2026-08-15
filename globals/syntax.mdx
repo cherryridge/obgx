@@ -37,13 +37,7 @@ Types and enum members are usually named with PascalCase, while objects, fields,
 
 ### Reserved Words
 
-The following words are reserved and MUST NOT be used as user-defined identifiers:
-
-- `type` and `enum` are declaration keywords.
-- `i8`, `i16`, `i32`, `i64`, `u8`, `u16`, `u32`, `u64`, `f32`, `f64`, `bool`, `string`, and `hndl` are fundamental type names.
-- `void` is a special type name that can only appear as the return type of a function type or function declaration.
-- `any` is the type wildcard used in type patterns.
-- `true` and `false` are boolean literals.
+Declaration keywords `type` and `enum` are reserved and MUST NOT be used as user-defined identifiers.
 
 ### Literals
 
@@ -74,6 +68,8 @@ f32
 f64
 bool
 string
+id
+refid
 ```
 
 ### Wildcards and Type Patterns
@@ -125,7 +121,7 @@ i32[][4]
 Parentheses can make grouping explicit when a suffix applies to a function type or another nested type expression. Therefore, the following denotes an array of four functions that take an `i32` and return a `bool`:
 
 ```obgx
-((value: i32) => bool)[]
+((value: i32) => bool)[4]
 ```
 
 ### Function Types
@@ -158,7 +154,7 @@ hndl("semanticName")
 
 ### Object Declarations
 
-An object declaration consists of an identifier, `:`, a type expression, and a required semicolon:
+An object declaration consists of an identifier, `:`, a type expression, and `;`:
 
 ```obgx
 objectName: ObjectType;
@@ -166,44 +162,65 @@ objectName: ObjectType;
 
 ### Compound Type Declarations
 
-A compound type declaration starts with `type`, followed by the type identifier and a brace-delimited sequence of field declarations. Each field declaration and the closing brace must be followed by a semicolon.
+A compound type declaration starts with `type`, followed by the type identifier and a brace-delimited sequence of field declarations. Each field declaration must be followed by `;`.
 
 ```obgx
 type TypeName {
     field1: type1;
     field2: type2;
-};
+}
 ```
 
 An empty compound type is permitted:
 
 ```obgx
-type EmptyType {};
+type EmptyType {}
 ```
 
 ### Enum Declarations
 
-An enum declaration starts with `enum`, followed by the type identifier and a non-empty, brace-delimited, comma-separated list of member identifiers. A trailing comma is not permitted. The closing brace must be followed by a semicolon.
+An enum declaration starts with `enum`, followed by the type identifier and a non-empty, brace-delimited, comma-separated list of member identifiers. A trailing comma is not permitted.
 
 ```obgx
-enum EnumName {
+enum EnumTypeName {
     Value1,
     Value2
-};
+}
+```
+
+A member identifier may be followed by a parenthesized type expression that gives the member's payload type:
+
+```obgx
+enum EnumTypeName {
+    Value1,
+    Value2(PayloadType)
+}
+```
+
+A member value is written as:
+
+```obgx
+EnumTypeName.Value1
+```
+
+The payload of a member value is written as:
+
+```obgx
+EnumTypeName.Value2.payload
 ```
 
 ### Function Declarations
 
-A function declaration consists of a function identifier, a parenthesized parameter list, `:`, a return type, and a required semicolon. Parameters use the same form and comma rules as function types.
+A function declaration consists of a function identifier, a parenthesized parameter list, `:`, and a return type. Parameters use the same form and comma rules as function types.
 
 ```obgx
-functionName(param1: type1, param2: type2): returnType;
+functionName(param1: type1, param2: type2): returnType
 ```
 
 A zero-parameter function declaration uses an empty parameter list:
 
 ```obgx
-functionName(): void;
+functionName(): void
 ```
 
 ## Field References

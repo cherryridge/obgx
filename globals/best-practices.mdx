@@ -4,13 +4,21 @@ displayed_sidebar: sidebar
 
 # Best Practices
 
-This page describes best practices for an OBGX implementation for maximizing compability, performance, maintainability, and extensibility. It is not normative and does not define any requirements for an implementation.
+This page describes best practices for an OBGX implementation for maximizing compatibility, performance, maintainability, and extensibility. It is not normative and does not define any requirements for an implementation.
 
 ## Implementing Types
 
 ### Fundamental Types
 
 Most of the programming languages have built-in support for most of the fundamental types defined by OBGX. An implementation should use the host language's built-in types whenever possible.
+
+#### Identifier
+
+It is recommended to use the same underlying representation as `string` for `id` and `refid`, since being serializable to human readable text is a common diagnostic requirement for identifiers.
+
+It is recommended to use a separator character that is not allowed in an `id` to separate the namespace and the identifier in a `refid`, to achieve contiguous storage and a human readable combination. CherryGrove uses `:` as the separator character just as Minecraft.
+
+If the chosen type and schema for `id` and `refid` doesn't meet the requirement that packs can construct a `refid` from a game object identifier `id` value and a namespace `id` value via only language features, it is recommended to implement the ability to construct a `refid` from one or two `id`s in the [`identifier`](pathname:///ref/identifier) module.
 
 #### Void
 
@@ -24,11 +32,13 @@ It's worth noting that some languages' built-in null types may be able to conver
 
 Enums in OBGX are similar to tagged unions. For C and C++ implementations, it is recommended to use one `enum` and one `union` for representing OBGX enums, since they deliver more performance than `std::variant` or `std::any`. For other languages, it is recommended to use the language's built-in tagged union type, if available.
 
+Enum's specification has no unified member/payload representation, and with the limited tools of reflection, this cannot be polyfilled in a generic way. That's why we don't have a module/element for enums to determine its active member, or obtain the payload, like arrays or vectors. You need to implement it in your own way.
+
 #### Arrays and Vectors
 
 If one element type is very frequently used in arrays and/or vectors and is fixed-size (e.g. integers, floats), it is recommended to use an arena for contiguous storage of the elements. This will improve performance and reduce memory fragmentation.
 
-It is recommended to implement the ability to get length of an array/vector in the [`introspection`](pathname:///ref/introspection) module.
+If the language doesn't provide a way to get the length of an array or vector from their underlying representation, it is recommended to implement the ability to get length of an array/vector in the [`introspection`](pathname:///ref/introspection) module.
 
 #### Function Values
 
@@ -39,5 +49,3 @@ In declarative languages, it is recommended to use a function name as a string t
 ## Faults
 
 //todo: fault rework
-
-Since OBGX specifies that a fault should mainly redirect the execution flow of the caller pack to another location, it is recommended to implement a fault handler, optimally in the [`fault`](pathname:///ref/fault) module, with the core interface being a function to allow packs to register a custom callback function to handle faults when they occur.

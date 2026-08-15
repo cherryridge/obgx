@@ -37,20 +37,22 @@ type Range = {
 
 const KEYWORDS = new Set(["enum", "type"]);
 const BUILTIN_TYPES = new Set([
-    "any",
-    "bool",
-    "f32",
-    "f64",
-    "hndl",
     "i8",
     "i16",
     "i32",
     "i64",
-    "string",
     "u8",
     "u16",
     "u32",
     "u64",
+    "f32",
+    "f64",
+    "bool",
+    "id",
+    "refid",
+    "string",
+    "hndl",
+    "any",
     "void"
 ]);
 const LITERALS = new Set(["false", "Infinity", "NaN", "true"]);

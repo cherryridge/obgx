@@ -2,12 +2,12 @@
 type: type
 ---
 
-This type is used as parameter for the [`registerRecord`](registerRecord) function, this type describes a record to be registered to the host.
+This type stores the metadata of a record and is used as parameter for the [`registerRecord`](registerRecord) function.
 
 ```obgx
 type RecordDesc {
-    name: string;
+    recordId: id;
     // !link[/FieldDesc/] FieldDesc
     fields: FieldDesc[];
-};
+}
 ```

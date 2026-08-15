@@ -2,12 +2,12 @@
 type: function
 ---
 
-This function returns the count of elements in a vector.
+This function constructs a `refid` from an identifier and the namespace of the caller pack.
 
 :::note
 This function is for compatibility and may not be available in all implementations.
 :::
 
 ```obgx
-getVecLen(vec: any[]): u64
+conRefidFromSelf(id: id): refid
 ```

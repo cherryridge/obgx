@@ -11,9 +11,10 @@ enum FieldType {
     F32, F64,
     Bool,
     String,
-    // !link[/FieldType/g] FieldType
-    Array(FieldType), Vector(FieldType),
+    // !link[/FieldTypeArray/] FieldTypeArray
+    // !link[/\bFieldType\b/] FieldType
+    Array(FieldTypeArray), Vector(FieldType),
     // !link[/"record"/] hndl_record
     Record(hndl("record"))
-};
+}
 ```
