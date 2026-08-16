@@ -34,8 +34,8 @@ Current domains include:
 4. **Interaction**: Defines the interaction layer of the game, including user input, GUI, and other interaction mechanisms.
 5. **Host Services**: Defines the out-of-game capabilities that can be provided, such as networking, storage, multimedia, and other services that can be used by the content packs.
 6. **Runtime**: Defines the implementation-specific execution facilities available to content packs.
-7. **Host Integration**: Defines the lower level integration of the game engine with content packs, possibly including render pipelines, network packets, and other engine-level integration points.
-8. **Diagnostics**: Defines the diagnostic and debugging capabilities that can be provided by the game engine to content packs, including logging, error reporting, profiling, and other diagnostic tools.
+7. **Host Integration**: Defines the lower level integration of a host with its underlying game engine, possibly including render pipelines, network packets, and other engine-level integration points.
+8. **Diagnostics**: Defines the diagnostic and debugging capabilities that can be provided to content packs, including logging, error reporting, profiling, and other diagnostic tools.
 
 ## Module
 
@@ -75,15 +75,29 @@ For example, `block@1/Block` and `cherrygrove/block-layers@2/regBlockLayer` are 
 
 ## Game Object
 
-Refers to a piece of game content metadata registered with a host through an OBGX interface, such as a record, block, or entity.
+Refers to a piece of game content metadata registered with a host through an implementation of an OBGX interface, such as a record, block, or entity.
 
 ## Host
 
-(Or **implementation**, when describing with the perspective of implementers) refers to a block game engine that implements any module of the OBGX standard, and is capable of loading and running content packs.
+Refers to a logical OBGX interoperability environment that provides one or more implementations to packs. A host maintains the shared pack associations, namespaces, game object registrations, and other host-wide OBGX state used by its implementations.
+
+The implementations provided by a host operate on the same host-wide identities and registrations. They may use different representations, but those differences must not alter OBGX-visible identity or behavior when values or registered game objects are communicated between them.
+
+## Implementation
+
+Refers to a concrete, coherent realization of OBGX interfaces through which packs use OBGX within a host. An implementation may use one or more programming languages, declarative languages, or data formats.
+
+Each implementation belongs to exactly one host. A host may provide one or more implementations.
+
+An implementation is the unit for declaring support for OBGX modules, elements, and their versions.
+
+## Implementer
+
+Refers to a person or organization that develops a host, an implementation, or both.
 
 ## Pack
 
-(Or **content pack**) refers to a collection of interface usage code and static assets that can interact with any host that correctly implements any module of the OBGX standard.
+(Or **content pack**) refers to a collection of interface usage code and static assets that can interact with one or more implementations of a host that correctly implements the OBGX modules used by the pack.
 
 ## Identifier
 

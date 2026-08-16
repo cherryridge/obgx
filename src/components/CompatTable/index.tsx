@@ -3,13 +3,19 @@ import {useId} from "react";
 import Markdown from "react-markdown";
 import styles from "./style.module.css";
 
-export const hosts = {
-    cherrygrove: {
-        name: "CherryGrove"
+export const implementations = {
+    cherrygrove_js: {
+        name: "CherryGrove (JS)"
+    },
+    cherrygrove_wasm: {
+        name: "CherryGrove (WASM)"
+    },
+    cherrygrove_lua: {
+        name: "CherryGrove (Lua)"
     }
 } as const satisfies Record<string, {readonly name: string}>;
 
-export type HostId = keyof typeof hosts;
+export type ImplementationId = keyof typeof implementations;
 export type SupportStatus = "supported" | "partial" | "unsupported" | "unknown";
 
 export interface SupportStatement {
@@ -19,7 +25,7 @@ export interface SupportStatement {
     readonly notes?: string | readonly string[];
 }
 
-export type SupportMap = Partial<Record<HostId, SupportStatement>>;
+export type SupportMap = Partial<Record<ImplementationId, SupportStatement>>;
 
 export interface CompatibilitySubfeature {
     readonly name: string;
@@ -43,7 +49,7 @@ interface NoteEntry {
     readonly text: string;
 }
 
-const hostIds = Object.keys(hosts) as HostId[];
+const implementationIds = Object.keys(implementations) as ImplementationId[];
 const statusSymbols: Record<SupportStatus, string> = {
     supported: "✓",
     partial: "◐",
@@ -132,8 +138,8 @@ export default function CompatTable({element, support, subfeatures = []}: Compat
     const noteNumbersByCell = new Map<string, readonly number[]>();
 
     rows.forEach((row, rowIndex) => {
-        hostIds.forEach(hostId => {
-            const rawNotes = row.support[hostId]?.notes;
+        implementationIds.forEach(implementationId => {
+            const rawNotes = row.support[implementationId]?.notes;
             const noteTexts = rawNotes === undefined
                 ? []
                 : typeof rawNotes === "string" ? [rawNotes] : rawNotes;
@@ -144,7 +150,7 @@ export default function CompatTable({element, support, subfeatures = []}: Compat
                 notes.push({number, text});
                 return number;
             });
-            noteNumbersByCell.set(`${rowIndex}:${hostId}`, noteNumbers);
+            noteNumbersByCell.set(`${rowIndex}:${implementationId}`, noteNumbers);
         });
     });
 
@@ -153,14 +159,14 @@ export default function CompatTable({element, support, subfeatures = []}: Compat
             <div className={styles.scroller}>
                 <table className={styles.table}>
                     <caption className={styles.visuallyHidden}>
-                        {translate({id: "compatibility.table.caption", message: "Host compatibility"})}
+                        {translate({id: "compatibility.table.caption", message: "Implementation compatibility"})}
                     </caption>
                     <thead>
                         <tr>
                             <th scope="col"></th>
-                            {hostIds.map(hostId => (
-                                <th scope="col" key={hostId}>
-                                    {hosts[hostId].name}
+                            {implementationIds.map(implementationId => (
+                                <th scope="col" key={implementationId}>
+                                    {implementations[implementationId].name}
                                 </th>
                             ))}
                         </tr>
@@ -173,11 +179,11 @@ export default function CompatTable({element, support, subfeatures = []}: Compat
                                         ? <code>{row.name}</code>
                                         : <Markdown skipHtml>{row.name}</Markdown>}
                                 </th>
-                                {hostIds.map(hostId => (
+                                {implementationIds.map(implementationId => (
                                     <SupportCell
-                                        key={hostId}
-                                        statement={row.support[hostId]}
-                                        noteNumbers={noteNumbersByCell.get(`${rowIndex}:${hostId}`) ?? []}
+                                        key={implementationId}
+                                        statement={row.support[implementationId]}
+                                        noteNumbers={noteNumbersByCell.get(`${rowIndex}:${implementationId}`) ?? []}
                                         noteIdPrefix={noteIdPrefix}
                                     />
                                 ))}

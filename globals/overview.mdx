@@ -11,19 +11,20 @@ displayed_sidebar: sidebar
 ## Characteristics
 
 - **Interoperability**: OBGX allows different game components developed by different and previously unknown developers to coexist and work together, with minimal friction and easy implementation for more complicated features, such as engine-level determinism.
+
 - **Platform and Language Agnostic**: OBGX is designed to be platform agnostic. Its specifications are specifically designed, so that it can be implemented relatively easily in different languages, as well as in existing or future block game engines.
 
-    OBGX doesn't require developers to use a specific programming language to implement, or to use an existing interface. Even declarative languages such as JSON or YAML can be used to implement some of the simple modules.
+    OBGX does not require an implementation to use a specific programming language or interface form. An implementation may also accept declarative languages or data formats such as JSON or YAML for suitable modules.
 
     OBGX enables content developers to target multiple games with a single pack or a small migration effort.
 
-- **Extensibility**: OBGX does not limit implementers to a specific set or version of modules. Engine developers can implement their own vendored modules, and content developers can use it just like any other standard module.
+- **Extensibility**: OBGX does not limit implementations to a specific set or version of modules. Implementers can provide their own vendored modules, and content developers can use them just like standard modules.
 
 ## Boundaries
 
 The following aspects of a block game engine's modding/datapack/content pack API are NOT in scope for OBGX:
 
 1. Pack-level identity. OBGX does not define how a content pack is identified, versioned or the dependency management.
-2. Pack-level interface interaction. OBGX does not specify how and when, one or many packs should interact with the interface. OBGX only defines the interface and the expected behavior of the engine, and the engine is free to decide how to manage the content packs' interaction.
+2. Pack-level interface interaction. OBGX does not specify how or when one or many packs interact with an implementation. OBGX defines interfaces and their expected behavior, while the host and its implementations are free to decide how to manage content packs' interaction with them.
 
-    OBGX may define behavior relative to the pack performing an operation without defining how the host identifies, discovers, loads, or executes that pack.
+    OBGX may define behavior relative to the pack performing an operation without defining how the host identifies, discovers, loads, or executes that pack, or how a game engine realizes the host and its implementations.

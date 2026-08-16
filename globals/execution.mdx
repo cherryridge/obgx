@@ -6,25 +6,27 @@ displayed_sidebar: sidebar
 
 ## General
 
-This page defines behavior that occurs when OBGX operations are performed. It does not prescribe a host language, runtime, or error-handling mechanism.
+This page defines behavior that occurs when OBGX operations are performed. It does not prescribe an implementation language, runtime, or error-handling mechanism.
 
 The types on which operations act are defined by the [Type System](type).
 
 ## Namespaces
 
-A host must associate exactly one [namespace](terminology#namespace) with each pack. A host must associate the same namespace with all OBGX operations that it considers to originate from the same pack. Multiple packs may be associated with the same namespace.
+A host must associate exactly one [namespace](terminology#namespace) with each pack. A host must associate the same namespace with all OBGX operations that it considers to originate from the same pack, including operations performed through different implementations of that host. Multiple packs may be associated with the same namespace.
 
 An OBGX operation must not change the namespace associated with its caller pack.
 
 When a pack registers a game object through an OBGX interface, the host must register the game object under the namespace associated with the caller pack and the provided [`id`](type#id).
 
+A host's game object registrations are shared by its implementations. A game object registered through one implementation must remain the same registered game object when observed through another implementation of that host. Implementations may expose different representations of the game object, but those representations must preserve its OBGX-visible identity and behavior.
+
 An operation that registers a game object or modifies an existing game object's registration must identify that game object with an `id` and must use the namespace associated with the caller pack.
 
 An operation that can only target a game object under the namespace associated with the caller pack must identify that game object with an `id`. An operation that may target a game object under another namespace must identify that game object with a [`refid`](type#reference-id).
 
-OBGX do not specify how a host handles multiple registrations with the same namespace and `id`.
+OBGX does not specify how a host handles multiple registrations with the same namespace and `id`.
 
-OBGX does not specify how a host determines, stores, or internally represents the association between a pack and its namespace, including how the host determines whether operations originate from the same pack.
+OBGX does not specify how a host determines, stores, or internally represents the association between a pack and its namespace, including how the host determines whether operations performed through different implementations originate from the same pack.
 
 ## Numeric Operations
 
