@@ -82,7 +82,7 @@ The representation of an `id` is implementation-defined. OBGX does not prescribe
 
 #### Reference ID
 
-`refid` is a built-in type used to refer to a game object. A `refid` always contains the game object's identifier as `id` and a namespace as `id`. `refid` may NOT refer to a valid or registered game object.
+`refid` is a built-in type used to refer to a game object. A `refid` always contains the game object's identifier as `id` and a namespace as `id`. `refid` may not refer to a valid or registered game object.
 
 The host must provide at least one way to construct a `refid` from a game object identifier, and at least one way to construct a `refid` from an identifier and a namespace identifier.
 
@@ -150,4 +150,4 @@ A handle's semantic name describes the purpose or kind of data referenced by the
 
 ## Recursions in Definitions of Types
 
-Recursive occurrences in an OBGX type describe semantic containment only. Implementations MAY introduce transparent indirection, references, indices, interning, or other representations to implement recursive values. Such representation details MUST NOT alter the observable OBGX semantics.
+Recursive occurrences in an OBGX type describe semantic containment only. Implementations MAY introduce transparent indirection, references, indices, interning, or other representations to implement recursive values. Such representation details must not alter the observable OBGX semantics.
