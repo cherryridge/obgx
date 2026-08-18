@@ -1,0 +1,35 @@
+---
+displayed_sidebar: sidebar
+---
+
+# Fault
+
+## General
+
+A fault indicates that an OBGX operation failed to complete normally.
+
+An OBGX operation completes either normally or with a fault. Normal completion means that the operation completed according to its interface and produced its declared normal result, if any. Fault completion:
+
+1. does not produce the operation's declared normal result;
+2. cannot resume the operation at the point where the fault occurred, although the implementation may transfer control elsewhere to handle the fault; and
+3. does not imply rollback of any observable effect produced before the fault, unless the operation's interface explicitly defines such rollback behavior.
+
+A recoverable failure represented by normal result data defined by an interface is not a fault.
+
+## Fault Types
+
+Every fault has a fault type that identifies its kind. A fault type is atomic: it has no underlying OBGX type and cannot be further decomposed in OBGX specification boundary. Fault types are not OBGX value types and cannot be used where an OBGX value type or type pattern is required.
+
+OBGX faults are recorded as elements of standard fault module named [`fault`](pathname:///ref/fault).
+
+**Unless explicitly specified otherwise, an OBGX fault is optional to be implemented**, for any applicable reason. An implementation must document its support status for every OBGX fault in each module version for which it declares support.
+
+An implementation may define additional fault types. It must document every additional fault type that can be produced by an OBGX operation, including the type's identity, its triggering conditions, and the affected interfaces. An additional fault type must not use the identity of an OBGX fault or substitute for an OBGX type whose use is required.
+
+## Representation and Payload
+
+The representation, construction, propagation, and handling of faults are implementation-defined.
+
+OBGX does not define whether a fault carries a payload. If an implementation provides a payload, all information in that payload is implementation-defined, including its structure, representation, contents, and lifetime. A pack must not depend on fault payload information for behavior intended to be portable between implementations.
+
+Payload information does not change the fault type or its triggering conditions. When a fault crosses an implementation boundary within a host, OBGX does not require the payload to be preserved, converted, or made available by the receiving implementation.

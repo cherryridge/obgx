@@ -1,0 +1,18 @@
+---
+type: fault
+---
+
+:::warning
+Support for this fault type is required.
+:::
+
+Performing an array or vector indexing operation with an index outside the container's valid index domain must complete with this fault.
+
+An out-of-bounds access does not produce a default or undefined value. The index must not be wrapped or clamped, and producing this fault does not require the element type to have a default value. The access must not be represented as an ordinary recoverable-failure result.
+
+Possible payload includes:
+
+1. Information about the container.
+2. The index that was used to access the container.
+
+<CompatTable element="OutOfBoundsFault" support={{}}/>

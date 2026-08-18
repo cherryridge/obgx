@@ -8,3 +8,17 @@ This function returns `true` if the record type is fixed-size (i.e. it does not 
 // !link[/"record"/] hndl_record
 isRecordFixedSize(record: hndl("record")): bool
 ```
+
+<CompatTable element="isRecordFixedSize" support={{
+    cherrygrove_js: {
+        status: "supported",
+        versionAdded: "1"
+    },
+    cherrygrove_wasm: {
+        status: "supported",
+        versionAdded: "1"
+    },
+    cherrygrove_lua: {
+        status: "unsupported"
+    }
+}}/>

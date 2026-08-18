@@ -4,9 +4,17 @@ import HoverNote from "@site/src/components/HoverNote";
 
 import MDXComponents from "@theme-original/MDXComponents";
 
-export default {
-    ...MDXComponents,
+const providedComponents = {
     CodeHikeCode,
     CompatTable,
     HoverNote
+};
+
+declare global {
+    type MDXProvidedComponents = typeof providedComponents;
+}
+
+export default {
+    ...MDXComponents,
+    ...providedComponents
 };

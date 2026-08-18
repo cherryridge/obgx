@@ -38,14 +38,10 @@ Enum's specification has no unified member/payload representation, and with the 
 
 If one element type is very frequently used in arrays and/or vectors and is fixed-size (e.g. integers, floats), it is recommended to use an arena for contiguous storage of the elements. This will improve performance and reduce memory fragmentation.
 
-If the language doesn't provide a way to get the length of an array or vector from their underlying representation, it is recommended to implement the ability to get length of an array/vector in the [`introspection`](pathname:///ref/introspection) module.
+If the language doesn't provide an operation that obtains the length of an array or vector from its underlying representation, it is recommended to implement the corresponding function in the [`introspection`](pathname:///ref/introspection) module.
 
 #### Function Values
 
 Function values are often represented as function pointers or references in many programming languages. However, some languages do not have first-class functions.
 
 In declarative languages, it is recommended to use a function name as a string to represent a function value, when you can ensure it exists in the same pack written in a programming language, in another pack, or in the host. Oftentimes we just choose to not implement those parts of OBGX in a declarative language :)
-
-## Faults
-
-//todo: fault rework

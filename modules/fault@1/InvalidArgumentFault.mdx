@@ -1,0 +1,18 @@
+---
+type: fault
+---
+
+In an implementation or interface form that permits an argument to be supplied without first establishing its OBGX type or in which an argument's OBGX type is not determined by the implementation type or any other means, an operation may complete with this fault, when an argument is detected to does not denote a value of its declared OBGX type.
+
+This includes dynamically typed languages and representations in which establishing a type-consistent interface by static analysis is not possible, and in some cases where multiple implementation types are used to represent a single OBGX type or vice versa.
+
+This fault represents only an argument type mismatch. It must not be used merely because a correctly typed argument violates an interface-specific constraint, such as value-based constraints.
+
+**If this fault is produced, it must occur before the operation produces any OBGX-observable effect. If such effect has to take place before the argument can be checked, the effect must be rolled back or undone before this fault can be produced.**
+
+Possible payload includes:
+
+1. Any information identifying the argument, expected type, supplied value, or supplied type.
+2. The interface or operation in which the argument was supplied.
+
+<CompatTable element="InvalidArgumentFault" support={{}}/>

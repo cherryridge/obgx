@@ -71,6 +71,7 @@ export function createSidebarWith(dynamicItems: SidebarItems, resolveGlobalDocs 
         {id: "syntax", label: "Syntax"},
         {id: "type", label: "Type System"},
         {id: "execution", label: "Execution"},
+        {id: "fault", label: "Fault"},
         {id: "best-practices", label: "Best Practices"},
         {id: "contributing", label: "Contributing"},
     ] as const;

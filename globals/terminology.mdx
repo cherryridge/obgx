@@ -67,11 +67,29 @@ For example, `block@>=4<8` means the module `block` with version greater than or
 
 ## Element
 
-Refers to an atomic unit of normative construct inside a module, which can be a data structure, a function, or a class.
+Refers to an atomic unit of normative construct inside a module, which can be a type, an enum, a function, or a fault (type).
 
 An element must belong to one version of a module. The scheme for element identifiers is `<module-scheme>/<elementName>`, in which `<elementName>` matches `^[a-zA-Z_][a-zA-Z0-9_]*$`.
 
 For example, `block@1/Block` and `cherrygrove/block-layers@2/regBlockLayer` are valid element identifiers.
+
+## Interface
+
+Refers to an abstract contract defined by OBGX. An interface specifies a contract for types, values, operations, or behavior without specifying how an implementation represents or realizes them.
+
+OBGX types, object declarations, and function declarations are interfaces. An element may define an interface or part of one, and an interface does not need to correspond to an element.
+
+An implementation may realize an interface through programming-language types, operators, functions, methods, properties, declarative constructs, data formats, or any other suitable form.
+
+## Operation
+
+Refers to an abstract action whose semantics are defined or constrained by OBGX. An operation is independent of the concrete form used to perform it.
+
+Examples of operations include invoking a function, indexing an array or vector, determining an enum value's active member, obtaining an enum member's payload, and performing numeric arithmetic.
+
+An operation may be realized as a programming-language operator, function, method, property access, pattern match, declarative construct, data-processing step, or any other suitable mechanism. Performing an operation does not require calling an OBGX function, crossing an API or implementation boundary, interacting with an implementation or host, or transferring control to an OBGX runtime.
+
+OBGX may require an implementation to provide one or more operations for a specified purpose without prescribing their concrete forms. Every operation provided to satisfy such a requirement must satisfy the OBGX semantics defined for that purpose.
 
 ## Game Object
 
@@ -85,7 +103,7 @@ The implementations provided by a host operate on the same host-wide identities 
 
 ## Implementation
 
-Refers to a concrete, coherent realization of OBGX interfaces through which packs use OBGX within a host. An implementation may use one or more programming languages, declarative languages, or data formats.
+Refers to a concrete, coherent realization of OBGX interfaces and operations available to packs within a host. An implementation may use one or more programming languages, declarative languages, or data formats.
 
 Each implementation belongs to exactly one host. A host may provide one or more implementations.
 
@@ -97,7 +115,7 @@ Refers to a person or organization that develops a host, an implementation, or b
 
 ## Pack
 
-(Or **content pack**) refers to a collection of interface usage code and static assets that can interact with one or more implementations of a host that correctly implements the OBGX modules used by the pack.
+(Or **content pack**) refers to a collection of interface usage code and static assets that can use OBGX interfaces and operations as realized by one or more implementations of a host that correctly implements the OBGX modules used by the pack.
 
 ## Identifier
 

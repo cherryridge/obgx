@@ -6,13 +6,15 @@ displayed_sidebar: sidebar
 
 ## General
 
-This page defines behavior that occurs when OBGX operations are performed. It does not prescribe an implementation language, runtime, or error-handling mechanism.
+This page defines behavior that occurs when OBGX [operations](terminology#operation) are performed. It does not prescribe an implementation language, runtime, or error-handling mechanism.
+
+Unless explicitly stated otherwise, OBGX does not prescribe the concrete form used to perform an operation. An operation may be realized entirely through a programming language or another mechanism and does not require calling an OBGX function or interacting with an implementation or host at the time it is performed.
 
 The types on which operations act are defined by the [Type System](type).
 
 ## Namespaces
 
-A host must associate exactly one [namespace](terminology#namespace) with each pack. A host must associate the same namespace with all OBGX operations that it considers to originate from the same pack, including operations performed through different implementations of that host. Multiple packs may be associated with the same namespace.
+A host must associate exactly one [namespace](terminology#namespace) with each pack. For every operation whose behavior depends on the namespace associated with its caller pack, a host must use the same namespace for operations originating from that pack, including operations performed through different implementations of that host. Multiple packs may be associated with the same namespace.
 
 An OBGX operation must not change the namespace associated with its caller pack.
 
@@ -40,31 +42,6 @@ When the result of unsigned integer arithmetic exceeds the maximum value of its 
 
 Floating-point arithmetic must follow the IEEE 754 standard for binary floating-point arithmetic, **when observed from an OBGX interface**. This includes the definition of special values such as `NaN` and infinities, as well as rounding, overflow, and underflow behavior.
 
-## Faults
+## Fault Completion
 
-An OBGX operation completes either:
-
-1. normally; or
-2. with a fault.
-
-Normal completion means that the operation has completed successfully and returned the declared return value.
-
-Fault completion means that the operation has failed to complete normally. A fault:
-
-1. does not produce its declared normal return value;
-2. cannot be resumed, but may continue the execution elsewhere for handling the fault; and
-3. does not imply the rollback of observable effects of the partially completed operation, unless the operation's interface explicitly defines such rollback behavior.
-
-OBGX does not prescribe how faults are represented, propagated, or handled.
-
-When a fault triggers, 
-
-Recoverable failures that are part of an interface's normal operation may continue to be represented by success or result data defined by that interface.
-
-A complete list of specified possible causes of fault is listed below. A binding may define additional causes of faults.
-
-### 1. Out-of-Bounds Access
-
-Access to an array or vector with an index outside that container's valid index domain produces an out-of-bounds fault.
-
-An out-of-bounds access produces neither a default value nor an undefined value. The index must not be wrapped or clamped, and the fault does not require the element type to have a default value. It must not be represented as an ordinary recoverable-failure return value.
+An OBGX operation completes normally or with a [fault](fault). The Faults page defines fault completion and the requirements for standard and implementation-defined fault types.

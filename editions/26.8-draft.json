@@ -6,6 +6,7 @@
     "modules": [
         "introspection@1",
         "basic-handles@1",
+        "fault@1",
         "identifier@1",
         "record@1"
     ]

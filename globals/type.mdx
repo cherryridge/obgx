@@ -6,11 +6,11 @@ displayed_sidebar: sidebar
 
 ## General
 
-The OBGX type system defines the abstract types and values used by OBGX interfaces. It is independent of any implementation language or storage format. **Unless explicitly stated otherwise, the underlying representation of a value is implementation-defined**.
+The OBGX type system defines the abstract types and values used by OBGX [interfaces](terminology#interface). It is independent of any implementation language or storage format. **Unless explicitly stated otherwise, the underlying representation of a value is implementation-defined**.
 
 Different implementations of the same host may still use different representations for the same OBGX value. When a value is communicated between those implementations, its representation may change, but its OBGX-visible semantics must be preserved, which means the host should properly convert the value between representations when it is communicated between implementations.
 
-The standardized textual forms for these types are defined by [Syntax](syntax). Behavior produced by operations on values is defined by [Execution](execution).
+The standardized textual forms for these types are defined by [Syntax](syntax). Behavior produced by [operations](terminology#operation) on values is defined by [Execution](execution).
 
 ## Type Patterns
 
@@ -86,11 +86,11 @@ The representation of an `id` is implementation-defined. OBGX does not prescribe
 
 `refid` is a built-in type used to refer to a game object. A `refid` always contains the game object's identifier as `id` and a namespace as `id`. `refid` may not refer to a valid or registered game object.
 
-Each implementation must provide at least one way to construct a `refid` from a game object identifier, and at least one way to construct a `refid` from an identifier and a namespace identifier.
+Each implementation must provide at least one operation that constructs a `refid` from a game object identifier, and at least one operation that constructs a `refid` from an identifier and a namespace identifier.
 
-When constructing a `refid` with a game object identifier (the first case in the previous paragraph), the host must use the namespace associated with the caller pack to construct the `refid`.
+When the first kind of construction operation is performed, the host must use the namespace associated with the caller pack to construct the `refid`.
 
-OBGX does not prescribe the API or language construct used to construct `refid`.
+OBGX does not prescribe the concrete form of either construction operation.
 
 The representation of a `refid` is implementation-defined. OBGX does not require its identifier and namespace identifier to be stored or passed any particular format, and does not prescribe a textual separator or serialized form.
 
@@ -106,9 +106,9 @@ Each member must have a unique underlying representation.
 
 Each member can optionally have an additional payload of a specific type. It should be accessible only when the value is that member.
 
-An implementation must provide at least one way to determine an enum value's active member.
+An implementation must provide at least one operation that determines an enum value's active member.
 
-For every member that has a payload, an implementation must also provide at least one way to obtain that payload when the value is that member. OBGX does not prescribe the API or language construct used for either operation.
+For every member that has a payload, an implementation must also provide at least one operation that obtains that payload when the value is that member. OBGX does not prescribe the concrete forms of these operations.
 
 ### Containers
 
@@ -118,17 +118,17 @@ Reminder: OBGX does not require a container to have a contiguous storage space.
 
 An array is an ordered, indexed collection of values of one element type. Every array has a fixed, positive length in the `u64` value range. Its valid indices are the unsigned integer values from `0` through `length - 1`.
 
-An implementation must provide at least one way to determine an array's length. OBGX does not prescribe the API or language construct used to obtain an array's length.
+An implementation must provide at least one operation that determines an array's length. OBGX does not prescribe the concrete form of this operation.
 
 #### Vector
 
 A vector is an ordered, indexed collection of values of one element type whose length is not determined at compile time and may vary during runtime. Every vector has a non-negative length in the `u64` value range. Its valid indices are the unsigned integer values from `0` through `length - 1`; an empty vector has no valid indices.
 
-An implementation must provide at least one way to determine a vector's length. OBGX does not prescribe the API or language construct used to obtain a vector's length.
+An implementation must provide at least one operation that determines a vector's length. OBGX does not prescribe the concrete form of this operation.
 
 ### Function Value
 
-A function value is an object that can be invoked with a specific set of argument types and has a specific return type.
+A function value is an object that can be invoked. Its invocation is an operation with a specific set of argument types and a specific return type.
 
 A function can be passed as an OBGX value. An implementation may represent a function value as a native function, a reference to a function, or any other implementation-defined representation.
 
